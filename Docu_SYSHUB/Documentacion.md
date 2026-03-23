@@ -91,7 +91,7 @@ A continuación, se formalizan las especificaciones del sistema utilizando un di
 
 -----
 
-## 2 Diagrama EDT
+## 2 ESTRUCTURA DE DESGLOSE DE TRABAJO (EDT)
 
 ![](imgs/EDT.png)
 
@@ -101,8 +101,6 @@ A continuación, se formalizan las especificaciones del sistema utilizando un di
 
 Cronograma:
 ![](imgs/GANTT.png)
-
-
 
 ### 3.1 Tabla de Hitos de Control
 
@@ -163,8 +161,6 @@ Cualquier sistema complejo se comporta y tiene lecturas distintas en función de
 
 Por su parte, la perspectiva del **Auxiliar de Cátedra** es diametralmente analítica e historicista. Ven el sistema como un mecanismo curatorial o como un registro documental semestral formal; un medio por el que las resoluciones robustas e inteligentes de los laboratorios no terminan perdiéndose ni borradas a los cuatro meses. La perspectiva del **Administrador**, bajo su perfil panóptico general, decodifica y evalúa la salud holística y legal del ecosistema (estabilidad estadística, categorías desfasadas). Y finalmente, en un plano altamente filosófico, la perspectiva **del Sistema en Sí Mismo** visualiza su propia arquitectura no como una plataforma rígida de registros con un servidor cloud, sino como un organismo de red emergente de conocimiento vivo, diseñado para auto-preservarse, mutar e incrementarse en inteligencia distribuida.
 
----
-
 ### 4.6. TABLA RESUMEN DSRP
 
 | Dimensión        | Elemento Analizado         | Descripción Sistémica                                                                                                              | Impacto en el Sistema Syshub                                                                                                |
@@ -186,4 +182,18 @@ Por su parte, la perspectiva del **Auxiliar de Cátedra** es diametralmente anal
 | **Perspectivas** | Visión del Moderador       | Uso correctivo: radar permanente de anomalías, spam o contenido de carácter impropio en los servidores.                            | Mantiene purificado, operativo y estático el orden institucional permitiendo que el sistema conserve reputación impecable.  |
 | **Perspectivas** | Visión Orgánica Global     | Redes autosanadoras donde un flujo sinérgico masivo se integra previniendo a la desaparición semestral sistemática.                | Comprende al ecosistema global holístico capaz de producir memoria institucional continua emergente.                        |
 
------
+---
+
+## 5. MAPA DE PROCESOS
+
+### 5.1. Flujo de Registro e Inicio de Sesión de Usuario
+
+![](imgs/MP1.png)
+
+### 5.2. Flujo de Publicación de un Repositorio de Proyecto
+
+![](imgs/MP2.png)
+
+### 5.3. Flujo de Participación en Foro (Sys-Reddit)
+
+![](imgs/MP3.png)
