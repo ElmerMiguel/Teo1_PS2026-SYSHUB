@@ -197,3 +197,37 @@ Por su parte, la perspectiva del **Auxiliar de Cátedra** es diametralmente anal
 ### 5.3. Flujo de Participación en Foro (Sys-Reddit)
 
 ![](imgs/MP3.png)
+
+## 6. DIAGRAMA ENTIDAD-RELACIÓN / LÓGICO (DER)
+
+![](imgs/ER.png)
+
+-----
+
+## 7. MOCKUPS
+
+### 7.1. Dashboard
+
+![](imgs/2026-03-23-09-29-55-image.png)
+
+### 7.2. Foros
+
+![](imgs/2026-03-23-09-30-44-image.png)
+
+
+
+### 7.3. Repositorio (Mis Proyectos)
+
+![](imgs/2026-03-23-09-31-34-image.png)
+
+### 7.4. Perfil
+
+![](imgs/2026-03-23-09-33-10-image.png)
+
+### 7.5. Blogs y artículos
+
+![](imgs/2026-03-23-09-35-01-image.png)
+
+### 7.6. Guardados
+
+![](imgs/2026-03-23-09-36-19-image.png)
