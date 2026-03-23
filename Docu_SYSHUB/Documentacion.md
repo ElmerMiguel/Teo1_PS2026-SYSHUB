@@ -1,6 +1,6 @@
 # Documentacion
 
-# # SECCIÓN 1 — GESTIÓN DE PROYECTO
+# SECCIÓN 1 — GESTIÓN DE PROYECTO
 
 ## 1. ENUNCIADO DE ALCANCE DEL PROYECTO: SYSHUB
 
@@ -89,18 +89,22 @@ A continuación, se formalizan las especificaciones del sistema utilizando un di
 | **RF-D-004** | El sistema debe contar con una bandeja procesadora de reclamos sociales (Moderación).   | Moderador        | Alta      | **DADO** el acceso al panel central por un Moderador<br>**CUANDO** verifica la cola de moderación pendiente<br>**ENTONCES** ve la acumulación cronológica de conflictos reportados.<br><br>**DADO** un hilo denunciado múltiples veces<br>**CUANDO** el Moderador presiona "Eliminar contenido"<br>**ENTONCES** desaparece definitivamente de la vista pública.                                |
 | **RF-D-005** | El sistema debe autorizar bloqueos y suspensiones por vulnerar regulaciones.            | Moderador, Admin | Media     | **DADO** un estudiante que trasgredió los términos severamente<br>**CUANDO** el moderador dicta un "Baneo de cuenta"<br>**ENTONCES** se revoca inmediatamente cualquier token activo del usuario.<br><br>**DADO** el mismo usuario baneado<br>**CUANDO** intenta entrar nuevamente con sus credenciales intactas<br>**ENTONCES** el sistema alerta "Acceso denegado: contacto con el soporte". |
 
+-----
+
 ## 2 Diagrama EDT
 
 ![](imgs/EDT.png)
 
-## CRONOGRAMA DE ACTIVIDADES (DIAGRAMA DE GANTT)
+----
+
+## 3. CRONOGRAMA DE ACTIVIDADES (DIAGRAMA DE GANTT)
 
 Cronograma:
 ![](imgs/GANTT.png)
 
-----
 
-### Tabla de Hitos de Control
+
+### 3.1 Tabla de Hitos de Control
 
 | #   | Hito                                  | Semana   | Entregable verificable                                                                                                |
 | --- | ------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -110,9 +114,7 @@ Cronograma:
 | 4   | Plataforma social y Admin finalizado  | Semana 4 | Panel de moderación bloquea / activa roles; el sistema de upvotes funciona en tiempo real.                            |
 | 5   | Sistema integrado y Desplegado        | Semana 5 | El proyecto está montado en un servidor público (URL activa) pasando las pruebas críticas libres de bugs graves (P0). |
 
----
-
-### Tabla de Tiempo Estimado por Módulo
+### 3.2 Tabla de Tiempo Estimado por Módulo
 
 | Módulo           | Actividad (Backend + Frontend en paralelo)          | Semanas       | Horas estimadas |
 | ---------------- | --------------------------------------------------- | ------------- | --------------- |
@@ -123,3 +125,65 @@ Cronograma:
 | **Módulo D**     | Panel de Gobernanza Administrativa y Moderador      | 1 semana      | 35 horas        |
 | **Integración**  | QA testing integral, mitigación de errores y Deploy | 1 semana      | 40 horas        |
 | **TOTAL**        | **Desarrollo completo acelerado**                   | **5 Semanas** | **250 horas**   |
+
+---
+
+---
+
+# SECCIÓN 2 — MODELADO SISTÉMICO Y TÉCNICO
+
+## 4. ANÁLISIS DSRP DEL SISTEMA SYSHUB
+
+### 4.1. INTRODUCCIÓN
+
+El framework DSRP (Distinctions, Systems, Relationships, Perspectives), desarrollado por los científicos Cabrera y Cabrera (2006), es un modelo avanzado de pensamiento sistémico diseñado para comprender la complejidad mediante la deconstrucción estructural de un fenómeno. Al aplicar el DSRP al proyecto "Syshub", el objetivo no es meramente enumerar los componentes de software, sino decodificar los patrones subyacentes que permiten a una simple plataforma web evolucionar hasta convertirse en un ecosistema de aprendizaje continuo. Este marco analítico permite estructurar mentalmente Syshub, definiendo sus límites axiomáticos, evaluando cómo sus partes individuales generan un todo emergente, mapeando las sinergias entre los usuarios y el contenido, y reconociendo cómo la percepción del entorno cambia drásticamente según quién interactúe con él.
+
+### 4.2. D — DISTINCIONES (QUÉ ES Y QUÉ NO ES)
+
+La dimensión de las distinciones define las fronteras ontológicas de Syshub; es decir, traza una línea clara entre lo que el sistema debe hacer y aquello de lo que debe abstenerse para mantener su propósito original inalterado.
+En primer lugar, establecemos que Syshub **ES** un ecosistema digital enfocado puramente en el conocimiento colectivo. A nivel operativo, actúa como un repositorio académico vivo que evoluciona con cada ciclo semestral. No es un cementerio de código obsoleto u olvidado, sino una red social técnica altamente especializada. La plataforma es un moderador orgánico de la experiencia estudiantil en la Facultad de Ingeniería en Ciencias y Sistemas: un hub donde el prestigio se gana por la calidad de las soluciones aportadas.
+
+Por contraste, es crucial delimitar lo que Syshub **NO ES**, previniendo que el "scope creep" (corrupción del alcance), debilite su arquitectura. Syshub no es un Sistema de Gestión de Aprendizaje (LMS) institucional como Canvas, Moodle o UEDi, por ende, carece de mecanismos formales para entregar notas, tomar asistencias o publicar ponderaciones oficiales de los catedráticos. Tampoco cumple las funciones cognitivas de una red social de carácter general (como Facebook o Instagram); sus foros están restringidos a la esfera académico-profesional. Finalmente, está distanciado de las plataformas de comunicación síncrona; en consecuencia, no integra esquemas para videoconferencias o mensajería en tiempo real tipo chat directo. Se mantiene focalizado estrictamente en la acumulación y categorización asíncrona pero altamente estructurada de saberes.
+
+### 4.3. S — SISTEMAS (PARTES Y EL TODO)
+
+En el modelo DSRP, un "sistema" se comprende determinando que cualquier entidad grande es la sumatoria interdependiente de sistemas menores subordinados (partes) que exhiben funciones limitadas por separado, pero un nivel de complejidad superior al reunirse. En el caso de Syshub, su anatomía está segmentada estructuralmente en cuatro subsistemas técnicos que se correlacionan. Se identifica un *Subsistema de Identidad*, responsable de la individualización y seguridad criptográfica de las credenciales; un *Subsistema de Conocimiento*, el núcleo duro de almacenamiento, que acopia proyectos y maneja el versionado documental de curaduría; un *Subsistema Social*, que alberga los foros, la calificación comunitaria y blogs; y un *Subsistema de Gobernanza*, la capa administrativa que dicta normas, jerarquiza roles y censura el ruido entrópico.
+
+Si analizamos estos cuatro módulos de forma aislada, encontramos sistemas puramente mecánicos: un registro CRUD, una base de almacenamiento de datos o un renderizador de listas. Sin embargo, cuando se operan en conjunto provocan un fenómeno conocido en teoría de sistemas como una **propiedad emergente**. En Syshub, esa propiedad es la *preservación transgeneracional del conocimiento colectivo*: un resultado sistémico que los módulos no pueden fabricar de modo individual. Gracias a la existencia combinada de perfiles, un foro donde consultarlo y curadores que destaquen lo adecuado, la base de datos trasciende y se percibe una inteligencia colectiva que neutraliza la amnesia semestral en la facultad cada vez que cambia un ciclo lectivo.
+
+### 4.4. R — RELACIONES (INTERACCIONES)
+
+Las relaciones dentro de Syshub componen la fuerza metabólica y dinámica del entorno, enlazando entidades que no poseen un significado contundente fuera de esta interdependencia. Un repositorio por sí mismo carece de vitalidad sin una interacción; por tanto, el eje es la de *Usuario-Contenido*. El estudiante que actúa de nodo productor (subir un proyecto o abrir un hilo en los foros) retroalimenta el sistema, al ser calificado, comentado o cuestionado por otro nodo receptor, lo que instiga un ciclo constante de generación intelectual mediada.
+
+Se desprenden igualmente las relaciones asimétricas, como aquellas del *Auxiliar-Proyecto* y del *Administrador-Sistema*. El Auxiliar establece la relación de Curaduría: no se adueña de la producción ajena, sino que aplica una interacción de filtrado evaluativo (destacando material semestral valioso) para maximizar la calidad orientada en los foros. De manera análoga, la relación *Admin-Sistema* es rectora; el administrador clasifica e impone moderaciones para que las estructuras permanezcan alineadas al pensum real vigente. Asimismo, no debe ignorarse la interacción de nivel superior generada por una entidad inmaterial o no humana llamada *Contenido-Visibilidad*: un patrón de realimentación positiva algorítmica donde un proyecto altamente valorado ("Upvoting" de foros), recibe mayor atracción automática desde el propio sistema, posicionándose espontáneamente hacia la primera página sin intervención administrativa adicional.
+
+### 4.5. P — PERSPECTIVAS
+
+Cualquier sistema complejo se comporta y tiene lecturas distintas en función del punto de observación o el contexto local del sujeto que examina la estructura, una noción intrínseca a la dimensión "Perspectivas". Para un **Estudiante**, la plataforma adquiere el cariz de un centro colaborativo e inmediato. El usuario ordinario experimenta Syshub adoptando el rol de "Prosumidor" (productor + consumidor simultáneo). Visualiza una herramienta indispensable para resolver barreras técnicas urgentes del día a día (dudas recurrentes en compiladores, lenguajes, etc.) y como un portafolio primitivo para atesorar y mostrar a sus pares la gloria particular de un compilador entregado en óptimas condiciones.
+
+Por su parte, la perspectiva del **Auxiliar de Cátedra** es diametralmente analítica e historicista. Ven el sistema como un mecanismo curatorial o como un registro documental semestral formal; un medio por el que las resoluciones robustas e inteligentes de los laboratorios no terminan perdiéndose ni borradas a los cuatro meses. La perspectiva del **Administrador**, bajo su perfil panóptico general, decodifica y evalúa la salud holística y legal del ecosistema (estabilidad estadística, categorías desfasadas). Y finalmente, en un plano altamente filosófico, la perspectiva **del Sistema en Sí Mismo** visualiza su propia arquitectura no como una plataforma rígida de registros con un servidor cloud, sino como un organismo de red emergente de conocimiento vivo, diseñado para auto-preservarse, mutar e incrementarse en inteligencia distribuida.
+
+---
+
+### 4.6. TABLA RESUMEN DSRP
+
+| Dimensión        | Elemento Analizado         | Descripción Sistémica                                                                                                              | Impacto en el Sistema Syshub                                                                                                |
+|:----------------:|:-------------------------- |:---------------------------------------------------------------------------------------------------------------------------------- |:--------------------------------------------------------------------------------------------------------------------------- |
+| **Distinciones** | Repositorio VS LMS         | Syshub aloja proyectos técnicos colectivos asíncronos; de ningún modo estructura notas, asistencia o rubricas formales académicas. | Previene la burocratización de la plataforma y sobrecarga de uso por responsabilidades administrativas del profesorado.     |
+| **Distinciones** | Red Social Especializada   | Limita la comunicación a hilos y publicación académica, prohibiendo mensajes directos privados (DMs) de socialización.             | Concentra la base de datos en información de alto grado de consulta útil para toda la comunidad simultáneamente.            |
+| **Distinciones** | Esfera de Conocimiento     | Determina formalmente al sistema como un hábitat para la salvaguarda y retransmisión de saberes, opuesto a una red general.        | Fija los requerimientos de diseño a la priorización de código y teoría aplicativa como metadato primario del software.      |
+| **Distinciones** | Inclusión y Exclusión      | Declara funcionalidades estrictamente Web, sin algoritmos automáticos IA de recomendación predictiva.                              | Garantiza la entrega técnica con viabilidad dentro de la restricción presupuestaria temporal de la actual "Fase 1".         |
+| **Sistemas**     | Módulo de Identidad        | Subsistema estructurado por reglas criptográficas (Roles, Perfiles, Login JWT).                                                    | Proporciona individualidad a cada acción en el Ecosistema para que asimile reputación persistente.                          |
+| **Sistemas**     | Módulo de Repositorio      | Centro persistente de acopio y descargas de código, recursos en JSON y etiquetado (TAGS).                                          | Actúa como nodo de información inerte en espera de reanimación y conexión con futuras dudas.                                |
+| **Sistemas**     | Módulo Social Foros        | Intersecciones algorítmicas (Sys-Reddit) entre perfiles y conocimiento para entablar debatas escalares.                            | Estimula al software inerte de proyectos logrando que se transforme hacia el aprendizaje continuo mutante.                  |
+| **Sistemas**     | Propiedad Emergente        | El conocimiento técnico imperecedero, consolidado como un activo derivado espontáneo inter-módulo.                                 | Causa la propia razón de existir de los modelos estructurales reduciendo sistemáticamente la amnesia en facultades.         |
+| **Relaciones**   | Hilo y Respuesta           | Enlace recíproco y temporal dependiente en los Foros donde una Consulta incita una réplica.                                        | Dinamiza orgánicamente toda la base de datos atrayendo un tráfico constante participativo.                                  |
+| **Relaciones**   | Curador y Laboratorio      | Relación jerárquica semi-automática en virtud de la cual un auxiliar promueve contenidos al rango superior destacado.              | Impide la saturación de data inservible orientando algoritmos para visibilizar lo genuinamente sobresaliente.               |
+| **Relaciones**   | Administrador y Estructura | Flujos bidireccionales en los cuales se controlan penalizaciones y reestructuraciones de áreas en el árbol.                        | Consigue prevenir estancamientos del proyecto frente a reformas programáticas del nivel administrativo universitario.       |
+| **Relaciones**   | Valoración Reputacional    | Algoritmo derivado del feedback "Upvote/Downvote" provocando que una publicación obtenga visualizaciones multiplicativas.          | Fomenta gamificación en donde la exactitud del conocimiento aportado dictamina directamente un estatus privilegiado social. |
+| **Perspectivas** | Visión del Estudiante      | Uso pragmático: resolver dudas, hallar ayuda en laboratorios y exhibición de aportaciones al portafolio.                           | Alimenta operativamente e impulsa permanentemente al sistema y lo masifica como sus generadores originarios.                |
+| **Perspectivas** | Visión del Auxiliar        | Uso documentalista: registro empírico y plataforma de re-difusión eficiente o preservación material del talento docente            | Sirve de herramienta catalizadora con respecto a los contenidos sobresalientes o a proyectos impecables.                    |
+| **Perspectivas** | Visión del Moderador       | Uso correctivo: radar permanente de anomalías, spam o contenido de carácter impropio en los servidores.                            | Mantiene purificado, operativo y estático el orden institucional permitiendo que el sistema conserve reputación impecable.  |
+| **Perspectivas** | Visión Orgánica Global     | Redes autosanadoras donde un flujo sinérgico masivo se integra previniendo a la desaparición semestral sistemática.                | Comprende al ecosistema global holístico capaz de producir memoria institucional continua emergente.                        |
+
+-----
