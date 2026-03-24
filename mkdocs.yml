@@ -1,0 +1,26 @@
+site_name: Documentación SYSHUB
+docs_dir: Docu_SYSHUB
+
+nav:
+  - Inicio: index.md
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - toc.integrate
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - admonition
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - tables
