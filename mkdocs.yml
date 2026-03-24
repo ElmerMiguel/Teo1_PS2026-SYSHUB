@@ -2,7 +2,15 @@ site_name: Documentación SYSHUB
 docs_dir: Docu_SYSHUB
 
 nav:
-  - Inicio: index.md
+  - INICIO: index.md
+  - 1. ENUNCIADO DE ALCANCE DEL PROYECTO SYSHUB : 1_alcance.md
+  - 2. ESTRUCTURA DE DESGLOSE DE TRABAJO (EDT) : 2_edt.md
+  - 3. CRONOGRAMA DE ACTIVIDADES (DIAGRAMA DE GANTT) : 3_gant.md
+  - 4. ANÁLISIS DSRP DEL SISTEMA SYSHUB : 4_dsrp.md
+  - 5. MAPA DE PROCESOS : 5_mapaProces.md
+  - 6. DIAGRAMA ENTIDAD-RELACIÓN : 6_der.md
+  - 7. MOCKUPS : 7_mock.md
+  - Referencias : z_ref.md
 
 theme:
   name: material
