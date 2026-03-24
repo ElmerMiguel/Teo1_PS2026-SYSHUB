@@ -2,7 +2,7 @@ site_name: Documentación SYSHUB
 docs_dir: Docu_SYSHUB
 
 nav:
-  - INICIO: index.md
+  - Inicio: index.md
   - 1. ENUNCIADO DE ALCANCE DEL PROYECTO SYSHUB : 1_alcance.md
   - 2. ESTRUCTURA DE DESGLOSE DE TRABAJO (EDT) : 2_edt.md
   - 3. CRONOGRAMA DE ACTIVIDADES (DIAGRAMA DE GANTT) : 3_gant.md
@@ -18,6 +18,8 @@ theme:
     - navigation.sections
     - navigation.indexes
     - toc.integrate
+
+use_directory_urls: false
 
 markdown_extensions:
   - toc:

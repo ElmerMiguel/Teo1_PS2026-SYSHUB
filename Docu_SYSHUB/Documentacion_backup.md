@@ -1,5 +1,8 @@
 # Documentacion
 
+### Teoria de sistemas 1 PS2026
+
+#### 201931295 - Elmer Wilson Miguel Juan
 # SECCIÓN 1 — GESTIÓN DE PROYECTO
 
 ## 1. ENUNCIADO DE ALCANCE DEL PROYECTO: SYSHUB
