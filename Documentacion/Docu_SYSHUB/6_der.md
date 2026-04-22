@@ -1,3 +1,0 @@
-## 6. DIAGRAMA ENTIDAD-RELACIÓN / LÓGICO (DER)
-
-![ER](imgs/ER.png)

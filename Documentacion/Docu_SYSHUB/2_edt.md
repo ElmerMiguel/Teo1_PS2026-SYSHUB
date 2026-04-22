@@ -1,3 +1,0 @@
-## 2. ESTRUCTURA DE DESGLOSE DE TRABAJO (EDT)
-
-![EDT](imgs/EDT.png)
