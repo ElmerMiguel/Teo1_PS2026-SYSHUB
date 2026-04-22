@@ -110,5 +110,4 @@ src/
    - reportes y sanciones
 
 ---
-
-Si quieres, en el siguiente paso te implemento **completo el módulo A (auth + perfiles)** con DTOs, guards, estrategia JWT, entidades y pruebas base.
+ **módulo A (auth + perfiles)**.

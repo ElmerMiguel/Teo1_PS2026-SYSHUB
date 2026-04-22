@@ -39,6 +39,13 @@ class EnvironmentVariables {
   @Min(1)
   @Max(65535)
   PORT?: number;
+
+  @IsString()
+  JWT_SECRET!: string;
+
+  @IsOptional()
+  @IsString()
+  JWT_EXPIRES_IN?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

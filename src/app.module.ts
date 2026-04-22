@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { validateEnv } from './config/env.validation';
 import { getTypeOrmConfig } from './database/typeorm.config';
-import { HealthModule } from './health/health.module.js';
+import { HealthModule } from './health/health.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { SocialModule } from './modules/social/social.module';
@@ -21,6 +21,8 @@ const databaseImports = isTestEnv
       }),
     ];
 
+const identityImports = isTestEnv ? [] : [IdentityModule];
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,7 +32,7 @@ const databaseImports = isTestEnv
     }),
     ...databaseImports,
     HealthModule,
-    IdentityModule,
+    ...identityImports,
     ProjectsModule,
     SocialModule,
     AdminModule,
