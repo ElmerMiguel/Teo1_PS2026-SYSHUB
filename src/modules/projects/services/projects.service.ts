@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -37,6 +38,12 @@ export class ProjectsService {
   ) {}
 
   async createProject(userId: number, dto: CreateProjectDto) {
+    if (dto.estado === EstadoProyecto.PUBLICADO) {
+      throw new BadRequestException(
+        'No puedes crear un proyecto publicado sin adjuntos; crea en borrador, sube archivos y luego publica.',
+      );
+    }
+
     await this.ensureUserExists(userId);
     await this.ensureCategoryExists(dto.idCategoria);
 
@@ -52,6 +59,7 @@ export class ProjectsService {
     });
 
     const saved = await this.projectRepository.save(project);
+
     return this.findById(saved.idProyecto);
   }
 
@@ -236,14 +244,20 @@ export class ProjectsService {
 
     await this.ensureCategoryExists(dto.idCategoria);
 
+    const nextEstado = dto.estado ?? project.estado;
+
     project.titulo = dto.titulo ?? project.titulo;
     project.descripcion = dto.descripcion ?? project.descripcion;
     project.stackTecnologico = dto.stackTecnologico ?? project.stackTecnologico;
-    project.estado = dto.estado ?? project.estado;
+    project.estado = nextEstado;
     project.idCategoria = dto.idCategoria ?? project.idCategoria;
 
     if (dto.etiquetas) {
       project.etiquetas = await this.resolveTags(dto.etiquetas);
+    }
+
+    if (nextEstado === EstadoProyecto.PUBLICADO) {
+      await this.validateProjectCanBePublished(projectId, project);
     }
 
     await this.projectRepository.save(project);
@@ -361,5 +375,33 @@ export class ProjectsService {
   private hasCurationRole(roles: string[]): boolean {
     const normalized = roles.map((role) => role.toUpperCase());
     return normalized.includes('AUXILIAR') || normalized.includes('ADMIN');
+  }
+
+  private async validateProjectCanBePublished(
+    projectId: number,
+    project: ProyectoEntity,
+  ): Promise<void> {
+    const hasDescription = Boolean(project.descripcion?.trim());
+    const hasStack =
+      !!project.stackTecnologico &&
+      typeof project.stackTecnologico === 'object' &&
+      Object.keys(project.stackTecnologico).length > 0;
+    const hasTags = !!project.etiquetas && project.etiquetas.length > 0;
+
+    if (!hasDescription || !hasStack || !hasTags) {
+      throw new BadRequestException(
+        'Para publicar el proyecto necesitas descripción, stack tecnológico y al menos una etiqueta.',
+      );
+    }
+
+    const filesCount = await this.fileRepository.count({
+      where: { idProyecto: projectId },
+    });
+
+    if (filesCount < 1) {
+      throw new BadRequestException(
+        'Para publicar el proyecto debes adjuntar al menos un archivo.',
+      );
+    }
   }
 }

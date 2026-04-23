@@ -111,3 +111,89 @@ src/
 
 ---
  **módulo A (auth + perfiles)**.
+
+
+-----
+ **módulo B**.
+
+### Estado actual (implementado)
+
+El **Módulo B - Repositorio de Proyectos y Tareas** está implementado en backend con:
+
+- CRUD base de proyectos.
+- Carga de adjuntos por metadata y subida real de archivos (disco local).
+- Gestión de etiquetas (tags) y categorías.
+- Curaduría de proyectos por rol (`AUXILIAR` / `ADMIN`).
+- Búsqueda y paginación.
+- DTOs + serializers de respuesta para contratos consistentes de API.
+- Pruebas unitarias y e2e del módulo.
+
+### Endpoints del Módulo B (`/api/projects`)
+
+#### Proyectos
+
+- `POST /api/projects` (JWT)
+  - Crea proyecto en estado inicial (no permite crear directo en `publicado`).
+- `GET /api/projects`
+  - Lista proyectos.
+- `GET /api/projects/me/list` (JWT)
+  - Lista proyectos del usuario autenticado.
+- `GET /api/projects/:projectId`
+  - Obtiene detalle de proyecto.
+- `PATCH /api/projects/:projectId` (JWT)
+  - Actualiza proyecto (owner/admin).
+- `DELETE /api/projects/:projectId` (JWT)
+  - Elimina proyecto y sus adjuntos asociados.
+
+#### Archivos de proyecto
+
+- `POST /api/projects/:projectId/files` (JWT)
+  - Agrega metadata de archivo en `ARCHIVO_PROYECTO`.
+- `POST /api/projects/:projectId/files/upload` (JWT, multipart)
+  - Sube archivo real al disco (`uploads/projects/:projectId`) y registra metadata.
+- `GET /api/projects/:projectId/files/:fileId/download` (JWT)
+  - Descarga archivo con validación de permisos.
+- `DELETE /api/projects/:projectId/files/:fileId` (JWT)
+  - Elimina metadata y archivo físico (si existe).
+
+#### Curaduría, búsqueda y catálogos
+
+- `POST /api/projects/:projectId/curate` (JWT, AUXILIAR/ADMIN)
+  - Marca/actualiza curaduría de proyecto.
+- `GET /api/projects/curated`
+  - Lista proyectos curados activos.
+- `GET /api/projects/tags`
+  - Lista etiquetas disponibles.
+- `GET /api/projects/categories`
+  - Lista categorías disponibles.
+- `GET /api/projects/search?tag=&categoryId=&q=&page=&limit=`
+  - Búsqueda por filtros con paginación.
+
+### Reglas de negocio implementadas
+
+- Para publicar (`estado = publicado`) se exige:
+  - descripción,
+  - stack tecnológico,
+  - al menos 1 etiqueta,
+  - al menos 1 archivo adjunto.
+- Curaduría restringida a roles `AUXILIAR` o `ADMIN`.
+- Modificación/eliminación de proyecto restringida a owner o `ADMIN`.
+- Descarga de archivo:
+  - permitida al owner,
+  - permitida a `ADMIN`,
+  - permitida a terceros solo si el proyecto está `publicado`.
+
+### Pruebas del Módulo B
+
+- Unitarias:
+  - `src/modules/projects/services/projects.service.spec.ts`
+- E2E:
+  - `test/projects.e2e-spec.ts`
+
+Incluidas en la ejecución estándar:
+
+```bash
+npm run test
+npm run test:e2e
+```
+ 

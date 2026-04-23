@@ -1,8 +1,10 @@
 import {
   ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsEnum,
   IsInt,
+  IsObject,
   IsOptional,
   IsString,
   Length,
@@ -18,9 +20,11 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @IsString()
+  @Length(10, 5000)
   descripcion?: string;
 
   @IsOptional()
+  @IsObject()
   stackTecnologico?: Record<string, unknown>;
 
   @IsOptional()
@@ -34,6 +38,9 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @IsArray()
+  @ArrayMinSize(1)
   @ArrayMaxSize(15)
+  @IsString({ each: true })
+  @Length(1, 100, { each: true })
   etiquetas?: string[];
 }

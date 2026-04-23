@@ -1,8 +1,10 @@
 import {
+  ArrayMinSize,
   ArrayMaxSize,
   IsArray,
   IsEnum,
   IsInt,
+  IsObject,
   IsOptional,
   IsString,
   Length,
@@ -15,12 +17,12 @@ export class CreateProjectDto {
   @Length(3, 200)
   titulo!: string;
 
-  @IsOptional()
   @IsString()
-  descripcion?: string;
+  @Length(10, 5000)
+  descripcion!: string;
 
-  @IsOptional()
-  stackTecnologico?: Record<string, unknown>;
+  @IsObject()
+  stackTecnologico!: Record<string, unknown>;
 
   @IsOptional()
   @IsEnum(EstadoProyecto)
@@ -31,8 +33,10 @@ export class CreateProjectDto {
   @Min(1)
   idCategoria?: number;
 
-  @IsOptional()
   @IsArray()
+  @ArrayMinSize(1)
   @ArrayMaxSize(15)
-  etiquetas?: string[];
+  @IsString({ each: true })
+  @Length(1, 100, { each: true })
+  etiquetas!: string[];
 }

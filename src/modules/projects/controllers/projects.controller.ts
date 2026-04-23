@@ -19,8 +19,16 @@ import type { JwtPayload } from '../../identity/auth/jwt-payload.interface';
 import { AddProjectFileDto } from '../dto/add-project-file.dto';
 import { CreateProjectDto } from '../dto/create-project.dto';
 import { CurateProjectDto } from '../dto/curate-project.dto';
+import {
+  PaginatedProjectsResponseDto,
+  ProjectCategoryResponseDto,
+  ProjectResponseDto,
+  ProjectTagResponseDto,
+} from '../dto/project-response.dto';
+import { SearchProjectsDto } from '../dto/search-projects.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
 import { ProjectsService } from '../services/projects.service';
+import { ProjectsSerializer } from '../serializers/projects.serializer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as fs from 'fs';
@@ -33,76 +41,87 @@ export class ProjectsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@CurrentUser() user: JwtPayload, @Body() dto: CreateProjectDto) {
-    return this.projectsService.createProject(user.sub, dto);
+  async create(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: CreateProjectDto,
+  ): Promise<ProjectResponseDto> {
+    const project = await this.projectsService.createProject(user.sub, dto);
+    return ProjectsSerializer.toProjectDto(project);
   }
 
   @Get()
-  list() {
-    return this.projectsService.listProjects();
+  async list(): Promise<ProjectResponseDto[]> {
+    const projects = await this.projectsService.listProjects();
+    return ProjectsSerializer.toProjectListDto(projects);
   }
 
   @Get('tags')
-  tags() {
-    return this.projectsService.listTags();
+  async tags(): Promise<ProjectTagResponseDto[]> {
+    const tags = await this.projectsService.listTags();
+    return ProjectsSerializer.toTagListDto(tags);
   }
 
   @Get('categories')
-  categories() {
-    return this.projectsService.listCategories();
+  async categories(): Promise<ProjectCategoryResponseDto[]> {
+    const categories = await this.projectsService.listCategories();
+    return ProjectsSerializer.toCategoryListDto(categories);
   }
 
   @Get('curated')
-  curated() {
-    return this.projectsService.listCuratedProjects();
+  async curated(): Promise<ProjectResponseDto[]> {
+    const projects = await this.projectsService.listCuratedProjects();
+    return ProjectsSerializer.toProjectListDto(projects);
   }
 
   @Get('search')
-  search(
-    @Query('tag') tag?: string,
-    @Query('categoryId') categoryId?: string,
-    @Query('q') q?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.projectsService.searchProjects({
-      tag,
-      categoryId: categoryId ? Number(categoryId) : undefined,
-      q,
-      page: page ? Number(page) : undefined,
-      limit: limit ? Number(limit) : undefined,
-    });
+  async search(
+    @Query() query: SearchProjectsDto,
+  ): Promise<PaginatedProjectsResponseDto> {
+    const result = await this.projectsService.searchProjects(query);
+    return ProjectsSerializer.toPaginatedProjectsDto(result);
   }
 
   @Get('me/list')
   @UseGuards(JwtAuthGuard)
-  listMine(@CurrentUser() user: JwtPayload) {
-    return this.projectsService.listMyProjects(user.sub);
+  async listMine(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<ProjectResponseDto[]> {
+    const projects = await this.projectsService.listMyProjects(user.sub);
+    return ProjectsSerializer.toProjectListDto(projects);
   }
 
   @Get(':projectId')
-  findOne(@Param('projectId', ParseIntPipe) projectId: number) {
-    return this.projectsService.findById(projectId);
+  async findOne(
+    @Param('projectId', ParseIntPipe) projectId: number,
+  ): Promise<ProjectResponseDto> {
+    const project = await this.projectsService.findById(projectId);
+    return ProjectsSerializer.toProjectDto(project);
   }
 
   @Patch(':projectId')
   @UseGuards(JwtAuthGuard)
-  update(
+  async update(
     @CurrentUser() user: JwtPayload,
     @Param('projectId', ParseIntPipe) projectId: number,
     @Body() dto: UpdateProjectDto,
-  ) {
-    return this.projectsService.updateProject(user, projectId, dto);
+  ): Promise<ProjectResponseDto> {
+    const project = await this.projectsService.updateProject(
+      user,
+      projectId,
+      dto,
+    );
+    return ProjectsSerializer.toProjectDto(project);
   }
 
   @Post(':projectId/files')
   @UseGuards(JwtAuthGuard)
-  addFile(
+  async addFile(
     @CurrentUser() user: JwtPayload,
     @Param('projectId', ParseIntPipe) projectId: number,
     @Body() dto: AddProjectFileDto,
-  ) {
-    return this.projectsService.addFile(user, projectId, dto);
+  ): Promise<ProjectResponseDto> {
+    const project = await this.projectsService.addFile(user, projectId, dto);
+    return ProjectsSerializer.toProjectDto(project);
   }
 
   @Post(':projectId/files/upload')
@@ -136,8 +155,11 @@ export class ProjectsController {
     @CurrentUser() user: JwtPayload,
     @Param('projectId', ParseIntPipe) projectId: number,
     @UploadedFile() file: Express.Multer.File,
-  ) {
-    if (!file) return this.projectsService.findById(projectId);
+  ): Promise<ProjectResponseDto> {
+    if (!file) {
+      const project = await this.projectsService.findById(projectId);
+      return ProjectsSerializer.toProjectDto(project);
+    }
 
     const relativePath = path.join(
       'uploads',
@@ -146,14 +168,14 @@ export class ProjectsController {
       file.filename,
     );
 
-    await this.projectsService.addFile(user, projectId, {
+    const project = await this.projectsService.addFile(user, projectId, {
       nombreArchivo: file.originalname,
       rutaArchivo: relativePath,
       tipoMime: file.mimetype,
       tamanioBytes: file.size,
     });
 
-    return this.projectsService.findById(projectId);
+    return ProjectsSerializer.toProjectDto(project);
   }
 
   @Delete(':projectId')
@@ -167,12 +189,17 @@ export class ProjectsController {
 
   @Delete(':projectId/files/:fileId')
   @UseGuards(JwtAuthGuard)
-  deleteFile(
+  async deleteFile(
     @CurrentUser() user: JwtPayload,
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('fileId', ParseIntPipe) fileId: number,
-  ) {
-    return this.projectsService.deleteFile(user, projectId, fileId);
+  ): Promise<ProjectResponseDto> {
+    const project = await this.projectsService.deleteFile(
+      user,
+      projectId,
+      fileId,
+    );
+    return ProjectsSerializer.toProjectDto(project);
   }
 
   @Get(':projectId/files/:fileId/download')
@@ -184,7 +211,12 @@ export class ProjectsController {
     @Res() res: Response,
   ) {
     const file = await this.projectsService.getFile(user, projectId, fileId);
-    return res.sendFile(file.path, (err) => {
+
+    if (file.mime) {
+      res.contentType(file.mime);
+    }
+
+    return res.download(file.path, file.filename, (err) => {
       if (err) {
         res.status(404).send({ message: 'Archivo no encontrado' });
       }
@@ -193,11 +225,16 @@ export class ProjectsController {
 
   @Post(':projectId/curate')
   @UseGuards(JwtAuthGuard)
-  curate(
+  async curate(
     @CurrentUser() user: JwtPayload,
     @Param('projectId', ParseIntPipe) projectId: number,
     @Body() dto: CurateProjectDto,
-  ) {
-    return this.projectsService.curateProject(user, projectId, dto);
+  ): Promise<ProjectResponseDto> {
+    const project = await this.projectsService.curateProject(
+      user,
+      projectId,
+      dto,
+    );
+    return ProjectsSerializer.toProjectDto(project);
   }
 }
