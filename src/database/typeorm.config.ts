@@ -8,6 +8,18 @@ const parsePort = (value: string | undefined, fallback: number): number => {
   return Number.isInteger(parsed) ? parsed : fallback;
 };
 
+const getMigrationGlobs = (): string[] => {
+  const isTsNodeExecution =
+    process.argv.some((arg) => arg.includes('ts-node')) ||
+    process.argv.some((arg) => arg.includes('typeorm-ts-node'));
+
+  if (isTsNodeExecution) {
+    return [path.join(process.cwd(), 'src/database/migrations/*.ts')];
+  }
+
+  return [path.join(process.cwd(), 'dist/database/migrations/*.js')];
+};
+
 export const buildDataSourceOptions = (): DataSourceOptions => ({
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -20,10 +32,7 @@ export const buildDataSourceOptions = (): DataSourceOptions => ({
   logging: false,
   migrationsRun: false,
   entities: [path.join(process.cwd(), 'dist/**/*.entity.js')],
-  migrations: [
-    path.join(process.cwd(), 'src/database/migrations/*{.ts,.js}'),
-    path.join(process.cwd(), 'dist/database/migrations/*{.ts,.js}'),
-  ],
+  migrations: getMigrationGlobs(),
 });
 
 export const getTypeOrmConfig = (): TypeOrmModuleOptions => ({
