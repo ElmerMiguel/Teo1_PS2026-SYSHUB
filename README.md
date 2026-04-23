@@ -202,4 +202,69 @@ Incluidas en la ejecución estándar:
 npm run test
 npm run test:e2e
 ```
+
+-----
+ **módulo C**.
+
+### Estado actual (implementado)
+
+El **Módulo C - Sección Social y Foros (Sys-Reddit)** está implementado en backend con:
+
+- Hilos de discusión por categorías.
+- Artículos/blogs con control de rol (`AUXILIAR` / `ADMIN`).
+- Comentarios en hilos y artículos con soporte de respuestas anidadas.
+- Sistema de valoraciones (`upvote` / `downvote`) en hilo/comentario/artículo.
+- Ranking de comentarios en hilos por score.
+- Reporte de contenido (hilo/comentario/proyecto).
+- DTOs y serializers de respuesta para contratos consistentes.
+- Pruebas unitarias y e2e del módulo.
+
+### Endpoints del Módulo C (`/api/social`)
+
+#### Hilos
+
+- `POST /api/social/threads` (JWT)
+- `GET /api/social/threads`
+- `GET /api/social/threads/:idHilo`
+
+#### Artículos
+
+- `POST /api/social/articles` (JWT, AUXILIAR/ADMIN)
+- `GET /api/social/articles`
+- `GET /api/social/articles/:idArticulo`
+
+#### Comentarios
+
+- `POST /api/social/threads/:idHilo/comments` (JWT)
+- `GET /api/social/threads/:idHilo/comments`
+- `GET /api/social/threads/:idHilo/comments/ranked`
+- `POST /api/social/articles/:idArticulo/comments` (JWT)
+- `GET /api/social/articles/:idArticulo/comments`
+
+#### Interacciones y reportes
+
+- `POST /api/social/votes` (JWT)
+- `POST /api/social/reports` (JWT)
+- `GET /api/social/reports` (JWT, MODERADOR/ADMIN)
+- `PATCH /api/social/reports/:idReporte/status` (JWT, MODERADOR/ADMIN)
+
+### Guía rápida de payloads (Módulo C)
+
+- Crear reporte de hilo:
+  - `{ "razon": "spam", "descripcion": "contenido repetitivo", "idHilo": 15 }`
+- Valorar comentario:
+  - `{ "tipo": "upvote", "idComentario": 44 }`
+- Modera reporte (resolver):
+  - `PATCH /api/social/reports/9/status`
+  - `{ "estado": "resuelto" }`
+- Modera reporte (desestimar):
+  - `PATCH /api/social/reports/9/status`
+  - `{ "estado": "desestimado" }`
+
+### Pruebas del Módulo C
+
+- Unitarias:
+  - `src/modules/social/services/social.service.spec.ts`
+- E2E:
+  - `test/social.e2e-spec.ts`
  
