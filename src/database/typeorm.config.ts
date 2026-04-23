@@ -8,12 +8,24 @@ const parsePort = (value: string | undefined, fallback: number): number => {
   return Number.isInteger(parsed) ? parsed : fallback;
 };
 
-const getMigrationGlobs = (): string[] => {
-  const isTsNodeExecution =
+const isTsRuntime = (): boolean => {
+  return (
     process.argv.some((arg) => arg.includes('ts-node')) ||
-    process.argv.some((arg) => arg.includes('typeorm-ts-node'));
+    process.argv.some((arg) => arg.includes('typeorm-ts-node')) ||
+    process.env.TS_NODE === 'true'
+  );
+};
 
-  if (isTsNodeExecution) {
+const getEntityGlobs = (): string[] => {
+  if (isTsRuntime()) {
+    return [path.join(process.cwd(), 'src/**/*.entity.ts')];
+  }
+
+  return [path.join(process.cwd(), 'dist/**/*.entity.js')];
+};
+
+const getMigrationGlobs = (): string[] => {
+  if (isTsRuntime()) {
     return [path.join(process.cwd(), 'src/database/migrations/*.ts')];
   }
 
@@ -31,7 +43,7 @@ export const buildDataSourceOptions = (): DataSourceOptions => ({
   synchronize: false,
   logging: false,
   migrationsRun: false,
-  entities: [path.join(process.cwd(), 'dist/**/*.entity.js')],
+  entities: getEntityGlobs(),
   migrations: getMigrationGlobs(),
 });
 
