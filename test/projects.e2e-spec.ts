@@ -16,6 +16,7 @@ describe('ProjectsController (e2e)', () => {
       listProjects: jest.fn(),
       searchProjects: jest.fn(),
       deleteProject: jest.fn(),
+      registerProjectView: jest.fn(),
     };
 
   const guardMock = {
@@ -121,6 +122,23 @@ describe('ProjectsController (e2e)', () => {
     await request(app.getHttpServer()).delete('/api/projects/9').expect(200);
 
     expect(projectsServiceMock.deleteProject).toHaveBeenCalledWith(
+      expect.objectContaining({ sub: 1 }),
+      9,
+    );
+  });
+
+  it('POST /api/projects/:projectId/views should register unique view', async () => {
+    projectsServiceMock.registerProjectView?.mockResolvedValue({
+      projectId: 9,
+      vistas: 11,
+      viewed: true,
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/projects/9/views')
+      .expect(201);
+
+    expect(projectsServiceMock.registerProjectView).toHaveBeenCalledWith(
       expect.objectContaining({ sub: 1 }),
       9,
     );

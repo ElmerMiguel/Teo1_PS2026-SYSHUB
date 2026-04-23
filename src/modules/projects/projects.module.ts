@@ -8,6 +8,7 @@ import { CategoriaEntity } from './entities/categoria.entity';
 import { CuraduriaEntity } from './entities/curaduria.entity';
 import { EtiquetaEntity } from './entities/etiqueta.entity';
 import { ProyectoEntity } from './entities/proyecto.entity';
+import { ProyectoVistaEntity } from './entities/proyecto-vista.entity';
 import { ProjectsService } from './services/projects.service';
 
 @Module({
@@ -18,6 +19,7 @@ import { ProjectsService } from './services/projects.service';
       CuraduriaEntity,
       CategoriaEntity,
       EtiquetaEntity,
+      ProyectoVistaEntity,
       UsuarioEntity,
     ]),
   ],

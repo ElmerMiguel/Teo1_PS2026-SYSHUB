@@ -21,6 +21,7 @@ describe('ProjectsService', () => {
   let categoryRepository: RepoMock;
   let tagRepository: RepoMock;
   let userRepository: RepoMock;
+  let projectViewRepository: RepoMock;
 
   const ownerUser: JwtPayload = {
     sub: 1,
@@ -89,6 +90,16 @@ describe('ProjectsService', () => {
       createQueryBuilder: jest.fn(),
     };
 
+    projectViewRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
     service = new ProjectsService(
       projectRepository as never,
       fileRepository as never,
@@ -96,6 +107,7 @@ describe('ProjectsService', () => {
       categoryRepository as never,
       tagRepository as never,
       userRepository as never,
+      projectViewRepository as never,
     );
   });
 
@@ -178,5 +190,42 @@ describe('ProjectsService', () => {
 
     expect(fileRepository.delete).toHaveBeenCalledWith({ idArchivo: 7 });
     expect(result).toEqual(updatedProject);
+  });
+
+  it('should register unique view for published project', async () => {
+    projectRepository.findOne.mockResolvedValue({
+      idProyecto: 4,
+      idUsuario: 99,
+      estado: EstadoProyecto.PUBLICADO,
+      vistas: 2,
+    });
+    projectViewRepository.findOne.mockResolvedValue(null);
+    projectViewRepository.create.mockReturnValue({
+      idProyecto: 4,
+      idUsuario: ownerUser.sub,
+    });
+
+    const result = await service.registerProjectView(ownerUser, 4);
+
+    expect(projectViewRepository.save).toHaveBeenCalled();
+    expect(projectRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ vistas: 3 }),
+    );
+    expect(result).toEqual({ projectId: 4, vistas: 3, viewed: true });
+  });
+
+  it('should not increment views if user already viewed project', async () => {
+    projectRepository.findOne.mockResolvedValue({
+      idProyecto: 5,
+      estado: EstadoProyecto.PUBLICADO,
+      vistas: 10,
+    });
+    projectViewRepository.findOne.mockResolvedValue({ idVista: 1 });
+
+    const result = await service.registerProjectView(ownerUser, 5);
+
+    expect(projectViewRepository.save).not.toHaveBeenCalled();
+    expect(projectRepository.save).not.toHaveBeenCalled();
+    expect(result).toEqual({ projectId: 5, vistas: 10, viewed: false });
   });
 });

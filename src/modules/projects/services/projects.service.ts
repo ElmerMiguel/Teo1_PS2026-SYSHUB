@@ -17,6 +17,7 @@ import { CategoriaEntity } from '../entities/categoria.entity';
 import { CuraduriaEntity } from '../entities/curaduria.entity';
 import { EtiquetaEntity } from '../entities/etiqueta.entity';
 import { ProyectoEntity, EstadoProyecto } from '../entities/proyecto.entity';
+import { ProyectoVistaEntity } from '../entities/proyecto-vista.entity';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -35,6 +36,8 @@ export class ProjectsService {
     private readonly tagRepository: Repository<EtiquetaEntity>,
     @InjectRepository(UsuarioEntity)
     private readonly userRepository: Repository<UsuarioEntity>,
+    @InjectRepository(ProyectoVistaEntity)
+    private readonly projectViewRepository: Repository<ProyectoVistaEntity>,
   ) {}
 
   async createProject(userId: number, dto: CreateProjectDto) {
@@ -214,6 +217,41 @@ export class ProjectsService {
       },
       order: { idProyecto: 'DESC' },
     });
+  }
+
+  async registerProjectView(user: JwtPayload, projectId: number) {
+    const project = await this.projectRepository.findOne({
+      where: { idProyecto: projectId },
+    });
+
+    if (!project) {
+      throw new NotFoundException('Proyecto no encontrado');
+    }
+
+    if (project.estado !== EstadoProyecto.PUBLICADO) {
+      throw new BadRequestException(
+        'Solo se registran vistas para proyectos publicados',
+      );
+    }
+
+    const existingView = await this.projectViewRepository.findOne({
+      where: { idProyecto: projectId, idUsuario: user.sub },
+    });
+
+    if (existingView) {
+      return { projectId, vistas: project.vistas ?? 0, viewed: false };
+    }
+
+    const view = this.projectViewRepository.create({
+      idProyecto: projectId,
+      idUsuario: user.sub,
+    });
+    await this.projectViewRepository.save(view);
+
+    project.vistas = (project.vistas ?? 0) + 1;
+    await this.projectRepository.save(project);
+
+    return { projectId, vistas: project.vistas, viewed: true };
   }
 
   async findById(projectId: number) {

@@ -184,6 +184,15 @@ CREATE TABLE MATERIAL_GUARDADO (
     fecha_guardado TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Métricas de visibilidad por usuario único en proyectos
+CREATE TABLE PROYECTO_VISTA (
+    id_vista INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_proyecto INT NOT NULL REFERENCES PROYECTO(id_proyecto) ON DELETE CASCADE,
+    id_usuario INT NOT NULL REFERENCES USUARIO(id_usuario) ON DELETE CASCADE,
+    fecha_visita TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_proyecto_vista_usuario UNIQUE (id_proyecto, id_usuario)
+);
+
 -- 7. ÍNDICES DE OPTIMIZACIÓN (DBA Performance)
 CREATE INDEX idx_usuario_email ON USUARIO(email);
 CREATE INDEX idx_proyecto_usuario ON PROYECTO(id_usuario);
@@ -192,3 +201,5 @@ CREATE INDEX idx_hilo_categoria ON HILO_FORO(id_categoria);
 CREATE INDEX idx_comentario_padre ON COMENTARIO(id_comentario_padre);
 CREATE INDEX idx_sesion_token ON SESION(token_hash);
 CREATE INDEX idx_material_usuario ON MATERIAL_GUARDADO(id_usuario);
+CREATE INDEX idx_proyecto_vista_proyecto ON PROYECTO_VISTA(id_proyecto);
+CREATE INDEX idx_proyecto_vista_usuario ON PROYECTO_VISTA(id_usuario);

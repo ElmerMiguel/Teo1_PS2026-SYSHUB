@@ -151,6 +151,7 @@ El **Módulo B - Repositorio de Proyectos y Tareas** está implementado en backe
   - Agrega metadata de archivo en `ARCHIVO_PROYECTO`.
 - `POST /api/projects/:projectId/files/upload` (JWT, multipart)
   - Sube archivo real al disco (`uploads/projects/:projectId`) y registra metadata.
+  - Restricciones: solo `.PDF` o `.ZIP`, máximo `50MB`.
 - `GET /api/projects/:projectId/files/:fileId/download` (JWT)
   - Descarga archivo con validación de permisos.
 - `DELETE /api/projects/:projectId/files/:fileId` (JWT)
@@ -168,6 +169,8 @@ El **Módulo B - Repositorio de Proyectos y Tareas** está implementado en backe
   - Lista categorías disponibles.
 - `GET /api/projects/search?tag=&categoryId=&q=&page=&limit=`
   - Búsqueda por filtros con paginación.
+- `POST /api/projects/:projectId/views` (JWT)
+  - Registra vista única por usuario para proyectos publicados.
 
 ### Reglas de negocio implementadas
 
@@ -182,6 +185,9 @@ El **Módulo B - Repositorio de Proyectos y Tareas** está implementado en backe
   - permitida al owner,
   - permitida a `ADMIN`,
   - permitida a terceros solo si el proyecto está `publicado`.
+- Vistas:
+  - solo cuentan en proyectos `publicado`,
+  - se incrementa una sola vez por usuario autenticado.
 
 ### Pruebas del Módulo B
 

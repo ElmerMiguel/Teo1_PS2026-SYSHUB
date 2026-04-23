@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -149,6 +150,25 @@ export class ProjectsController {
         },
       }),
       limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+      fileFilter: (req, file, cb) => {
+        const allowedMime = [
+          'application/pdf',
+          'application/zip',
+          'application/x-zip-compressed',
+          'multipart/x-zip',
+        ];
+        const ext = path.extname(file.originalname).toLowerCase();
+        const allowedExt = ['.pdf', '.zip'];
+
+        if (!allowedMime.includes(file.mimetype) && !allowedExt.includes(ext)) {
+          return cb(
+            new BadRequestException('Solo se permiten archivos .PDF o .ZIP'),
+            false,
+          );
+        }
+
+        cb(null, true);
+      },
     }),
   )
   async uploadFile(
@@ -221,6 +241,15 @@ export class ProjectsController {
         res.status(404).send({ message: 'Archivo no encontrado' });
       }
     });
+  }
+
+  @Post(':projectId/views')
+  @UseGuards(JwtAuthGuard)
+  registerView(
+    @CurrentUser() user: JwtPayload,
+    @Param('projectId', ParseIntPipe) projectId: number,
+  ) {
+    return this.projectsService.registerProjectView(user, projectId);
   }
 
   @Post(':projectId/curate')
