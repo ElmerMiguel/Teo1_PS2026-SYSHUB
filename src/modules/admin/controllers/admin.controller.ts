@@ -1,0 +1,118 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { CurrentUser } from '../../identity/auth/current-user.decorator';
+import { JwtAuthGuard } from '../../identity/auth/jwt-auth.guard';
+import type { JwtPayload } from '../../identity/auth/jwt-payload.interface';
+import { AdminService } from '../services/admin.service';
+import { AssignRoleDto } from '../dto/assign-role.dto';
+import { CreateCategoryDto } from '../dto/create-category.dto';
+import { ListAdminReportsDto } from '../dto/list-admin-reports.dto';
+import { ListUsersDto } from '../dto/list-users.dto';
+import { ModerateReportDto } from '../dto/moderate-report.dto';
+import { SetUserActiveDto } from '../dto/set-user-active.dto';
+import { UpdateCategoryDto } from '../dto/update-category.dto';
+
+@Controller('admin')
+@UseGuards(JwtAuthGuard)
+export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
+
+  @Get('users')
+  listUsers(@CurrentUser() user: JwtPayload, @Query() query: ListUsersDto) {
+    return this.adminService.listUsers(user, query);
+  }
+
+  @Patch('users/:idUsuario/active')
+  setUserActive(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+    @Body() dto: SetUserActiveDto,
+  ) {
+    return this.adminService.setUserActive(user, idUsuario, dto);
+  }
+
+  @Post('users/:idUsuario/roles')
+  assignRole(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+    @Body() dto: AssignRoleDto,
+  ) {
+    return this.adminService.assignRole(user, idUsuario, dto);
+  }
+
+  @Delete('users/:idUsuario/roles/:nombreRol')
+  removeRole(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+    @Param('nombreRol') nombreRol: string,
+  ) {
+    return this.adminService.removeRole(user, idUsuario, nombreRol);
+  }
+
+  @Delete('users/:idUsuario')
+  async deleteUser(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+  ) {
+    await this.adminService.deleteUser(user, idUsuario);
+    return { message: 'Usuario eliminado correctamente' };
+  }
+
+  @Get('categories')
+  listCategories(@CurrentUser() user: JwtPayload) {
+    return this.adminService.listCategories(user);
+  }
+
+  @Post('categories')
+  createCategory(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: CreateCategoryDto,
+  ) {
+    return this.adminService.createCategory(user, dto);
+  }
+
+  @Patch('categories/:idCategoria')
+  updateCategory(
+    @CurrentUser() user: JwtPayload,
+    @Param('idCategoria', ParseIntPipe) idCategoria: number,
+    @Body() dto: UpdateCategoryDto,
+  ) {
+    return this.adminService.updateCategory(user, idCategoria, dto);
+  }
+
+  @Delete('categories/:idCategoria')
+  async deleteCategory(
+    @CurrentUser() user: JwtPayload,
+    @Param('idCategoria', ParseIntPipe) idCategoria: number,
+  ) {
+    await this.adminService.deleteCategory(user, idCategoria);
+    return { message: 'Categoría eliminada correctamente' };
+  }
+
+  @Get('moderation/reports')
+  listReports(
+    @CurrentUser() user: JwtPayload,
+    @Query() query: ListAdminReportsDto,
+  ) {
+    return this.adminService.listReports(user, query);
+  }
+
+  @Patch('moderation/reports/:idReporte/status')
+  moderateReport(
+    @CurrentUser() user: JwtPayload,
+    @Param('idReporte', ParseIntPipe) idReporte: number,
+    @Body() dto: ModerateReportDto,
+  ) {
+    return this.adminService.moderateReport(user, idReporte, dto);
+  }
+}

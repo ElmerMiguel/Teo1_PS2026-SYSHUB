@@ -24,6 +24,7 @@ const databaseImports = isTestEnv
 const identityImports = isTestEnv ? [] : [IdentityModule];
 const projectsImports = isTestEnv ? [] : [ProjectsModule];
 const socialImports = isTestEnv ? [] : [SocialModule];
+const adminImports = isTestEnv ? [] : [AdminModule];
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ const socialImports = isTestEnv ? [] : [SocialModule];
     ...identityImports,
     ...projectsImports,
     ...socialImports,
-    AdminModule,
+    ...adminImports,
   ],
   controllers: [AppController],
   providers: [AppService],
