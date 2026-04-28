@@ -176,6 +176,27 @@ CREATE TABLE REPORTE (
     id_moderador INT REFERENCES USUARIO(id_usuario) ON DELETE SET NULL
 );
 
+CREATE TABLE ADMIN_AUDIT (
+    id_audit INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    accion VARCHAR(120) NOT NULL,
+    entidad VARCHAR(120) NOT NULL,
+    entidad_id INT,
+    detalles JSONB,
+    fecha_accion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    id_admin INT REFERENCES USUARIO(id_usuario) ON DELETE SET NULL
+);
+
+CREATE TABLE USUARIO_SUSPENSION (
+    id_suspension INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario INT NOT NULL REFERENCES USUARIO(id_usuario) ON DELETE CASCADE,
+    id_admin INT NOT NULL REFERENCES USUARIO(id_usuario) ON DELETE SET NULL,
+    razon VARCHAR(255) NOT NULL,
+    detalle TEXT,
+    fecha_inicio TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    fecha_fin TIMESTAMPTZ,
+    activo BOOLEAN DEFAULT TRUE
+);
+
 CREATE TABLE MATERIAL_GUARDADO (
     id_guardado INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_usuario INT NOT NULL REFERENCES USUARIO(id_usuario) ON DELETE CASCADE,
@@ -203,3 +224,5 @@ CREATE INDEX idx_sesion_token ON SESION(token_hash);
 CREATE INDEX idx_material_usuario ON MATERIAL_GUARDADO(id_usuario);
 CREATE INDEX idx_proyecto_vista_proyecto ON PROYECTO_VISTA(id_proyecto);
 CREATE INDEX idx_proyecto_vista_usuario ON PROYECTO_VISTA(id_usuario);
+CREATE INDEX idx_admin_audit_admin ON ADMIN_AUDIT(id_admin);
+CREATE INDEX idx_suspension_usuario ON USUARIO_SUSPENSION(id_usuario);

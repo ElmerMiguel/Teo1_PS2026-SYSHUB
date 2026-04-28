@@ -17,8 +17,14 @@ import {
   EstadoReporte,
   ReporteEntity,
 } from '../../social/entities/reporte.entity';
+import { AdminAuditEntity } from '../entities/admin-audit.entity';
+import { UsuarioSuspensionEntity } from '../entities/usuario-suspension.entity';
 import { AssignRoleDto } from '../dto/assign-role.dto';
 import { CreateCategoryDto } from '../dto/create-category.dto';
+import { CloseSuspensionDto } from '../dto/close-suspension.dto';
+import { CreateRoleDto } from '../dto/create-role.dto';
+import { CreateSuspensionDto } from '../dto/create-suspension.dto';
+import { ListAuditDto } from '../dto/list-audit.dto';
 import { ListAdminReportsDto } from '../dto/list-admin-reports.dto';
 import { ListUsersDto } from '../dto/list-users.dto';
 import {
@@ -27,6 +33,7 @@ import {
 } from '../dto/moderate-report.dto';
 import { SetUserActiveDto } from '../dto/set-user-active.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { UpdateRoleDto } from '../dto/update-role.dto';
 
 @Injectable()
 export class AdminService {
@@ -39,6 +46,10 @@ export class AdminService {
     private readonly categoryRepository: Repository<CategoriaEntity>,
     @InjectRepository(ReporteEntity)
     private readonly reportRepository: Repository<ReporteEntity>,
+    @InjectRepository(AdminAuditEntity)
+    private readonly auditRepository: Repository<AdminAuditEntity>,
+    @InjectRepository(UsuarioSuspensionEntity)
+    private readonly suspensionRepository: Repository<UsuarioSuspensionEntity>,
   ) {}
 
   async listUsers(admin: JwtPayload, query: ListUsersDto) {
@@ -78,7 +89,11 @@ export class AdminService {
 
     const user = await this.findUserById(userId);
     user.activo = dto.activo;
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    await this.logAudit(admin.sub, 'SET_USER_ACTIVE', 'usuario', userId, {
+      activo: dto.activo,
+    });
+    return saved;
   }
 
   async assignRole(
@@ -97,7 +112,11 @@ export class AdminService {
     }
 
     user.roles = [...user.roles, role];
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    await this.logAudit(admin.sub, 'ASSIGN_ROLE', 'usuario', userId, {
+      rol: role.nombreRol,
+    });
+    return saved;
   }
 
   async removeRole(
@@ -116,13 +135,107 @@ export class AdminService {
     }
 
     user.roles = filtered;
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    await this.logAudit(admin.sub, 'REMOVE_ROLE', 'usuario', userId, {
+      rol: role.nombreRol,
+    });
+    return saved;
   }
 
   async deleteUser(admin: JwtPayload, userId: number): Promise<void> {
     this.ensureAdminRole(admin.roles);
     const user = await this.findUserById(userId);
     await this.userRepository.remove(user);
+    await this.logAudit(admin.sub, 'DELETE_USER', 'usuario', userId);
+  }
+
+  async listRoles(admin: JwtPayload): Promise<RolEntity[]> {
+    this.ensureAdminRole(admin.roles);
+    return this.roleRepository.find({ order: { nombreRol: 'ASC' } });
+  }
+
+  async listAudits(admin: JwtPayload, query: ListAuditDto) {
+    this.ensureAdminRole(admin.roles);
+
+    const page = query.page && query.page > 0 ? query.page : 1;
+    const limit = query.limit && query.limit > 0 ? query.limit : 10;
+
+    const qb = this.auditRepository
+      .createQueryBuilder('a')
+      .leftJoinAndSelect('a.admin', 'admin')
+      .orderBy('a.fecha_accion', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [items, total] = await qb.getManyAndCount();
+    return { items, total, page, limit };
+  }
+
+  async createRole(admin: JwtPayload, dto: CreateRoleDto): Promise<RolEntity> {
+    this.ensureAdminRole(admin.roles);
+
+    const normalized = dto.nombreRol.trim().toUpperCase();
+    const existing = await this.roleRepository.findOne({
+      where: { nombreRol: normalized },
+    });
+
+    if (existing) {
+      throw new BadRequestException('El rol ya existe');
+    }
+
+    const role = this.roleRepository.create({
+      nombreRol: normalized,
+      descripcion: dto.descripcion,
+    });
+
+    const saved = await this.roleRepository.save(role);
+    await this.logAudit(admin.sub, 'CREATE_ROLE', 'rol', saved.idRol, {
+      nombreRol: normalized,
+    });
+
+    return saved;
+  }
+
+  async updateRole(
+    admin: JwtPayload,
+    roleId: number,
+    dto: UpdateRoleDto,
+  ): Promise<RolEntity> {
+    this.ensureAdminRole(admin.roles);
+
+    const role = await this.roleRepository.findOne({
+      where: { idRol: roleId },
+    });
+
+    if (!role) {
+      throw new NotFoundException('Rol no encontrado');
+    }
+
+    if (dto.nombreRol !== undefined) {
+      role.nombreRol = dto.nombreRol.trim().toUpperCase();
+    }
+    if (dto.descripcion !== undefined) {
+      role.descripcion = dto.descripcion;
+    }
+
+    const saved = await this.roleRepository.save(role);
+    await this.logAudit(admin.sub, 'UPDATE_ROLE', 'rol', roleId);
+    return saved;
+  }
+
+  async deleteRole(admin: JwtPayload, roleId: number): Promise<void> {
+    this.ensureAdminRole(admin.roles);
+
+    const role = await this.roleRepository.findOne({
+      where: { idRol: roleId },
+    });
+
+    if (!role) {
+      throw new NotFoundException('Rol no encontrado');
+    }
+
+    await this.roleRepository.remove(role);
+    await this.logAudit(admin.sub, 'DELETE_ROLE', 'rol', roleId);
   }
 
   async listCategories(user: JwtPayload): Promise<CategoriaEntity[]> {
@@ -131,6 +244,17 @@ export class AdminService {
       relations: { categoriaPadre: true },
       order: { nombre: 'ASC' },
     });
+  }
+
+  async listCategoryTree(user: JwtPayload): Promise<CategoriaEntity[]> {
+    this.ensureAdminOrModeratorRole(user.roles);
+
+    const categories = await this.categoryRepository.find({
+      relations: { categoriaPadre: true },
+      order: { nombre: 'ASC' },
+    });
+
+    return this.buildCategoryTree(categories);
   }
 
   async createCategory(
@@ -148,7 +272,14 @@ export class AdminService {
       categoriaPadre: parent,
     });
 
-    return this.categoryRepository.save(category);
+    const saved = await this.categoryRepository.save(category);
+    await this.logAudit(
+      admin.sub,
+      'CREATE_CATEGORY',
+      'categoria',
+      saved.idCategoria,
+    );
+    return saved;
   }
 
   async updateCategory(
@@ -182,7 +313,9 @@ export class AdminService {
       );
     }
 
-    return this.categoryRepository.save(category);
+    const saved = await this.categoryRepository.save(category);
+    await this.logAudit(admin.sub, 'UPDATE_CATEGORY', 'categoria', categoryId);
+    return saved;
   }
 
   async deleteCategory(admin: JwtPayload, categoryId: number): Promise<void> {
@@ -197,6 +330,7 @@ export class AdminService {
     }
 
     await this.categoryRepository.remove(category);
+    await this.logAudit(admin.sub, 'DELETE_CATEGORY', 'categoria', categoryId);
   }
 
   async listReports(user: JwtPayload, query: ListAdminReportsDto) {
@@ -207,6 +341,11 @@ export class AdminService {
 
     const qb = this.reportRepository
       .createQueryBuilder('r')
+      .leftJoinAndSelect('r.hilo', 'hilo')
+      .leftJoinAndSelect('r.comentario', 'comentario')
+      .leftJoinAndSelect('r.proyecto', 'proyecto')
+      .leftJoinAndSelect('r.reportador', 'reportador')
+      .leftJoinAndSelect('r.moderador', 'moderador')
       .orderBy('r.fecha_reporte', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
@@ -244,7 +383,99 @@ export class AdminService {
         : EstadoReporte.DESESTIMADO;
     report.idModerador = user.sub;
 
-    return this.reportRepository.save(report);
+    const saved = await this.reportRepository.save(report);
+    await this.logAudit(user.sub, 'MODERATE_REPORT', 'reporte', reportId, {
+      estado: saved.estado,
+    });
+    return saved;
+  }
+
+  async createSuspension(
+    admin: JwtPayload,
+    userId: number,
+    dto: CreateSuspensionDto,
+  ): Promise<UsuarioSuspensionEntity> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    const user = await this.findUserById(userId);
+    const activeSuspension = await this.suspensionRepository.findOne({
+      where: { idUsuario: userId, activo: true },
+    });
+
+    if (activeSuspension) {
+      throw new BadRequestException(
+        'El usuario ya tiene una suspensión activa',
+      );
+    }
+
+    user.activo = false;
+    await this.userRepository.save(user);
+
+    const suspension = this.suspensionRepository.create({
+      idUsuario: userId,
+      idAdmin: admin.sub,
+      razon: dto.razon,
+      detalle: dto.detalle,
+    });
+
+    const saved = await this.suspensionRepository.save(suspension);
+    await this.logAudit(admin.sub, 'SUSPEND_USER', 'usuario', userId, {
+      razon: dto.razon,
+    });
+
+    return saved;
+  }
+
+  async closeSuspension(
+    admin: JwtPayload,
+    userId: number,
+    suspensionId: number,
+    dto: CloseSuspensionDto,
+  ): Promise<UsuarioSuspensionEntity> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    const suspension = await this.suspensionRepository.findOne({
+      where: { idSuspension: suspensionId, idUsuario: userId },
+    });
+
+    if (!suspension) {
+      throw new NotFoundException('Suspensión no encontrada');
+    }
+
+    if (!suspension.activo) {
+      throw new BadRequestException('La suspensión ya está cerrada');
+    }
+
+    suspension.activo = false;
+    suspension.fechaFin = new Date();
+
+    if (dto.notaCierre) {
+      suspension.detalle = suspension.detalle
+        ? `${suspension.detalle}\nCierre: ${dto.notaCierre}`
+        : `Cierre: ${dto.notaCierre}`;
+    }
+
+    const saved = await this.suspensionRepository.save(suspension);
+
+    const user = await this.findUserById(userId);
+    user.activo = true;
+    await this.userRepository.save(user);
+
+    await this.logAudit(admin.sub, 'UNSUSPEND_USER', 'usuario', userId);
+    return saved;
+  }
+
+  async listSuspensions(
+    admin: JwtPayload,
+    userId: number,
+  ): Promise<UsuarioSuspensionEntity[]> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    await this.findUserById(userId);
+    return this.suspensionRepository.find({
+      where: { idUsuario: userId },
+      order: { fechaInicio: 'DESC' },
+    });
   }
 
   private ensureAdminRole(roles: string[]): void {
@@ -304,6 +535,52 @@ export class AdminService {
     }
 
     return parent;
+  }
+
+  private buildCategoryTree(categories: CategoriaEntity[]): CategoriaEntity[] {
+    const map = new Map<
+      number,
+      CategoriaEntity & { subcategorias: CategoriaEntity[] }
+    >();
+    const roots: CategoriaEntity[] = [];
+
+    categories.forEach((category) => {
+      map.set(category.idCategoria, {
+        ...category,
+        subcategorias: [],
+      });
+    });
+
+    map.forEach((category) => {
+      if (category.categoriaPadre?.idCategoria) {
+        const parent = map.get(category.categoriaPadre.idCategoria);
+        if (parent) {
+          parent.subcategorias.push(category);
+          return;
+        }
+      }
+      roots.push(category);
+    });
+
+    return roots;
+  }
+
+  private async logAudit(
+    adminId: number,
+    action: string,
+    entity: string,
+    entityId?: number,
+    details?: Record<string, unknown>,
+  ): Promise<void> {
+    const audit = this.auditRepository.create({
+      idAdmin: adminId,
+      accion: action,
+      entidad: entity,
+      entidadId: entityId,
+      detalles: details,
+    });
+
+    await this.auditRepository.save(audit);
   }
 
   readonly availableAreas: AreaTecnicaCategoria[] = [

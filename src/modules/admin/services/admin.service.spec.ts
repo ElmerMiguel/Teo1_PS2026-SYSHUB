@@ -19,6 +19,8 @@ describe('AdminService', () => {
   let roleRepository: RepoMock;
   let categoryRepository: RepoMock;
   let reportRepository: RepoMock;
+  let auditRepository: RepoMock;
+  let suspensionRepository: RepoMock;
 
   const adminUser: JwtPayload = {
     sub: 1,
@@ -69,11 +71,31 @@ describe('AdminService', () => {
       createQueryBuilder: jest.fn(),
     };
 
+    auditRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
+    suspensionRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
     service = new AdminService(
       userRepository as never,
       roleRepository as never,
       categoryRepository as never,
       reportRepository as never,
+      auditRepository as never,
+      suspensionRepository as never,
     );
   });
 
@@ -124,5 +146,28 @@ describe('AdminService', () => {
     await expect(service.deleteCategory(adminUser, 999)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it('suspends user and registers suspension record', async () => {
+    userRepository.findOne.mockResolvedValue({
+      idUsuario: 10,
+      activo: true,
+      roles: [],
+    });
+    suspensionRepository.findOne.mockResolvedValue(null);
+    userRepository.save.mockImplementation((payload: { activo: boolean }) =>
+      Promise.resolve(payload),
+    );
+    suspensionRepository.create.mockReturnValue({ idSuspension: 5 });
+    suspensionRepository.save.mockResolvedValue({
+      idSuspension: 5,
+      activo: true,
+    });
+
+    const result = await service.createSuspension(adminUser, 10, {
+      razon: 'Spam reiterado',
+    });
+
+    expect(result.idSuspension).toBe(5);
   });
 });

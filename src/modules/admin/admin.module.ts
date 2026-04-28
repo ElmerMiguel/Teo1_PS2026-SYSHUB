@@ -6,6 +6,8 @@ import { UsuarioEntity } from '../identity/entities/usuario.entity';
 import { CategoriaEntity } from '../projects/entities/categoria.entity';
 import { ReporteEntity } from '../social/entities/reporte.entity';
 import { AdminController } from './controllers/admin.controller';
+import { AdminAuditEntity } from './entities/admin-audit.entity';
+import { UsuarioSuspensionEntity } from './entities/usuario-suspension.entity';
 import { AdminService } from './services/admin.service';
 
 @Module({
@@ -15,6 +17,8 @@ import { AdminService } from './services/admin.service';
       RolEntity,
       CategoriaEntity,
       ReporteEntity,
+      AdminAuditEntity,
+      UsuarioSuspensionEntity,
     ]),
   ],
   controllers: [AdminController],

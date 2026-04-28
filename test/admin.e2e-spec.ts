@@ -99,6 +99,13 @@ describe('AdminController (e2e)', () => {
       .expect(400);
   });
 
+  it('POST /api/admin/users/:id/suspensions validates payload', async () => {
+    await request(app.getHttpServer())
+      .post('/api/admin/users/2/suspensions')
+      .send({ razon: 'no' })
+      .expect(400);
+  });
+
   it('POST /api/admin/categories returns 403 when service rejects by role', async () => {
     authUser = {
       sub: 2,

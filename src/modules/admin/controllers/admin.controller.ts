@@ -15,12 +15,17 @@ import { JwtAuthGuard } from '../../identity/auth/jwt-auth.guard';
 import type { JwtPayload } from '../../identity/auth/jwt-payload.interface';
 import { AdminService } from '../services/admin.service';
 import { AssignRoleDto } from '../dto/assign-role.dto';
+import { CloseSuspensionDto } from '../dto/close-suspension.dto';
 import { CreateCategoryDto } from '../dto/create-category.dto';
+import { CreateRoleDto } from '../dto/create-role.dto';
+import { CreateSuspensionDto } from '../dto/create-suspension.dto';
+import { ListAuditDto } from '../dto/list-audit.dto';
 import { ListAdminReportsDto } from '../dto/list-admin-reports.dto';
 import { ListUsersDto } from '../dto/list-users.dto';
 import { ModerateReportDto } from '../dto/moderate-report.dto';
 import { SetUserActiveDto } from '../dto/set-user-active.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { UpdateRoleDto } from '../dto/update-role.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard)
@@ -30,6 +35,38 @@ export class AdminController {
   @Get('users')
   listUsers(@CurrentUser() user: JwtPayload, @Query() query: ListUsersDto) {
     return this.adminService.listUsers(user, query);
+  }
+
+  @Get('users/:idUsuario/suspensions')
+  listSuspensions(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+  ) {
+    return this.adminService.listSuspensions(user, idUsuario);
+  }
+
+  @Post('users/:idUsuario/suspensions')
+  createSuspension(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+    @Body() dto: CreateSuspensionDto,
+  ) {
+    return this.adminService.createSuspension(user, idUsuario, dto);
+  }
+
+  @Patch('users/:idUsuario/suspensions/:idSuspension/close')
+  closeSuspension(
+    @CurrentUser() user: JwtPayload,
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+    @Param('idSuspension', ParseIntPipe) idSuspension: number,
+    @Body() dto: CloseSuspensionDto,
+  ) {
+    return this.adminService.closeSuspension(
+      user,
+      idUsuario,
+      idSuspension,
+      dto,
+    );
   }
 
   @Patch('users/:idUsuario/active')
@@ -73,6 +110,11 @@ export class AdminController {
     return this.adminService.listCategories(user);
   }
 
+  @Get('categories/tree')
+  listCategoriesTree(@CurrentUser() user: JwtPayload) {
+    return this.adminService.listCategoryTree(user);
+  }
+
   @Post('categories')
   createCategory(
     @CurrentUser() user: JwtPayload,
@@ -97,6 +139,39 @@ export class AdminController {
   ) {
     await this.adminService.deleteCategory(user, idCategoria);
     return { message: 'Categoría eliminada correctamente' };
+  }
+
+  @Get('roles')
+  listRoles(@CurrentUser() user: JwtPayload) {
+    return this.adminService.listRoles(user);
+  }
+
+  @Post('roles')
+  createRole(@CurrentUser() user: JwtPayload, @Body() dto: CreateRoleDto) {
+    return this.adminService.createRole(user, dto);
+  }
+
+  @Patch('roles/:idRol')
+  updateRole(
+    @CurrentUser() user: JwtPayload,
+    @Param('idRol', ParseIntPipe) idRol: number,
+    @Body() dto: UpdateRoleDto,
+  ) {
+    return this.adminService.updateRole(user, idRol, dto);
+  }
+
+  @Delete('roles/:idRol')
+  async deleteRole(
+    @CurrentUser() user: JwtPayload,
+    @Param('idRol', ParseIntPipe) idRol: number,
+  ) {
+    await this.adminService.deleteRole(user, idRol);
+    return { message: 'Rol eliminado correctamente' };
+  }
+
+  @Get('audit')
+  listAudits(@CurrentUser() user: JwtPayload, @Query() query: ListAuditDto) {
+    return this.adminService.listAudits(user, query);
   }
 
   @Get('moderation/reports')
