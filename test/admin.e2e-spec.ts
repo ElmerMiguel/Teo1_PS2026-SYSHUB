@@ -18,6 +18,7 @@ describe('AdminController (e2e)', () => {
     setUserActive: jest.fn(),
     createCategory: jest.fn(),
     listReports: jest.fn(),
+    deleteComment: jest.fn(),
   };
 
   let authUser: { sub: number; email: string; roles: string[] } = {
@@ -132,6 +133,14 @@ describe('AdminController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/api/admin/moderation/reports?estado=pendiente')
+      .expect(200);
+  });
+
+  it('DELETE /api/admin/moderation/comments/:id returns 200', async () => {
+    adminServiceMock.deleteComment?.mockResolvedValue(undefined);
+
+    await request(app.getHttpServer())
+      .delete('/api/admin/moderation/comments/4')
       .expect(200);
   });
 });

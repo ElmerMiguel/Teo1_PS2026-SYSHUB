@@ -11,13 +11,19 @@ type RepoMock = {
   save: jest.Mock;
   remove: jest.Mock;
   createQueryBuilder: jest.Mock;
+  update?: jest.Mock;
 };
 
 describe('AdminService', () => {
   let service: AdminService;
   let userRepository: RepoMock;
   let roleRepository: RepoMock;
+  let sessionRepository: RepoMock;
   let categoryRepository: RepoMock;
+  let projectRepository: RepoMock;
+  let articleRepository: RepoMock;
+  let commentRepository: RepoMock;
+  let threadRepository: RepoMock;
   let reportRepository: RepoMock;
   let auditRepository: RepoMock;
   let suspensionRepository: RepoMock;
@@ -53,7 +59,53 @@ describe('AdminService', () => {
       createQueryBuilder: jest.fn(),
     };
 
+    sessionRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+      update: jest.fn(),
+    };
+
     categoryRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
+    projectRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
+    articleRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
+    commentRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
+    };
+
+    threadRepository = {
       findOne: jest.fn(),
       find: jest.fn(),
       create: jest.fn(),
@@ -92,7 +144,12 @@ describe('AdminService', () => {
     service = new AdminService(
       userRepository as never,
       roleRepository as never,
+      sessionRepository as never,
       categoryRepository as never,
+      projectRepository as never,
+      articleRepository as never,
+      commentRepository as never,
+      threadRepository as never,
       reportRepository as never,
       auditRepository as never,
       suspensionRepository as never,
@@ -168,6 +225,23 @@ describe('AdminService', () => {
       razon: 'Spam reiterado',
     });
 
+    expect(sessionRepository.update).toHaveBeenCalled();
     expect(result.idSuspension).toBe(5);
+  });
+
+  it('soft deletes a comment as moderator', async () => {
+    commentRepository.findOne.mockResolvedValue({
+      idComentario: 4,
+      eliminado: false,
+    });
+    commentRepository.save.mockImplementation(
+      (payload: { eliminado: boolean }) => Promise.resolve(payload),
+    );
+
+    await service.deleteComment({ ...adminUser, roles: ['MODERADOR'] }, 4);
+
+    expect(commentRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ eliminado: true }),
+    );
   });
 });

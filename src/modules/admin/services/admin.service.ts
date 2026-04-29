@@ -8,11 +8,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtPayload } from '../../identity/auth/jwt-payload.interface';
 import { RolEntity } from '../../identity/entities/rol.entity';
+import { SesionEntity } from '../../identity/entities/sesion.entity';
 import { UsuarioEntity } from '../../identity/entities/usuario.entity';
 import {
   AreaTecnicaCategoria,
   CategoriaEntity,
 } from '../../projects/entities/categoria.entity';
+import { ProyectoEntity } from '../../projects/entities/proyecto.entity';
+import { ArticuloEntity } from '../../social/entities/articulo.entity';
+import { ComentarioEntity } from '../../social/entities/comentario.entity';
+import { HiloForoEntity } from '../../social/entities/hilo-foro.entity';
 import {
   EstadoReporte,
   ReporteEntity,
@@ -42,8 +47,18 @@ export class AdminService {
     private readonly userRepository: Repository<UsuarioEntity>,
     @InjectRepository(RolEntity)
     private readonly roleRepository: Repository<RolEntity>,
+    @InjectRepository(SesionEntity)
+    private readonly sessionRepository: Repository<SesionEntity>,
     @InjectRepository(CategoriaEntity)
     private readonly categoryRepository: Repository<CategoriaEntity>,
+    @InjectRepository(ProyectoEntity)
+    private readonly projectRepository: Repository<ProyectoEntity>,
+    @InjectRepository(ArticuloEntity)
+    private readonly articleRepository: Repository<ArticuloEntity>,
+    @InjectRepository(ComentarioEntity)
+    private readonly commentRepository: Repository<ComentarioEntity>,
+    @InjectRepository(HiloForoEntity)
+    private readonly threadRepository: Repository<HiloForoEntity>,
     @InjectRepository(ReporteEntity)
     private readonly reportRepository: Repository<ReporteEntity>,
     @InjectRepository(AdminAuditEntity)
@@ -410,6 +425,7 @@ export class AdminService {
 
     user.activo = false;
     await this.userRepository.save(user);
+    await this.revokeUserSessions(userId);
 
     const suspension = this.suspensionRepository.create({
       idUsuario: userId,
@@ -476,6 +492,72 @@ export class AdminService {
       where: { idUsuario: userId },
       order: { fechaInicio: 'DESC' },
     });
+  }
+
+  async deleteThread(admin: JwtPayload, idHilo: number): Promise<void> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    const thread = await this.threadRepository.findOne({
+      where: { idHilo },
+    });
+
+    if (!thread) {
+      throw new NotFoundException('Hilo no encontrado');
+    }
+
+    await this.threadRepository.remove(thread);
+    await this.logAudit(admin.sub, 'DELETE_THREAD', 'hilo', idHilo);
+  }
+
+  async deleteArticle(admin: JwtPayload, idArticulo: number): Promise<void> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    const article = await this.articleRepository.findOne({
+      where: { idArticulo },
+    });
+
+    if (!article) {
+      throw new NotFoundException('Artículo no encontrado');
+    }
+
+    await this.articleRepository.remove(article);
+    await this.logAudit(admin.sub, 'DELETE_ARTICLE', 'articulo', idArticulo);
+  }
+
+  async deleteComment(admin: JwtPayload, idComentario: number): Promise<void> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    const comment = await this.commentRepository.findOne({
+      where: { idComentario },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comentario no encontrado');
+    }
+
+    comment.eliminado = true;
+    await this.commentRepository.save(comment);
+    await this.logAudit(
+      admin.sub,
+      'DELETE_COMMENT',
+      'comentario',
+      idComentario,
+    );
+  }
+
+  async deleteProject(admin: JwtPayload, idProyecto: number): Promise<void> {
+    this.ensureAdminOrModeratorRole(admin.roles);
+
+    const project = await this.projectRepository.findOne({
+      where: { idProyecto },
+    });
+
+    if (!project) {
+      throw new NotFoundException('Proyecto no encontrado');
+    }
+
+    await this.projectRepository.remove(project);
+    await this.logAudit(admin.sub, 'DELETE_PROJECT', 'proyecto', idProyecto);
   }
 
   private ensureAdminRole(roles: string[]): void {
@@ -581,6 +663,13 @@ export class AdminService {
     });
 
     await this.auditRepository.save(audit);
+  }
+
+  private async revokeUserSessions(userId: number): Promise<void> {
+    await this.sessionRepository.update(
+      { idUsuario: userId, activa: true },
+      { activa: false },
+    );
   }
 
   readonly availableAreas: AreaTecnicaCategoria[] = [

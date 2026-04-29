@@ -267,4 +267,63 @@ El **Módulo C - Sección Social y Foros (Sys-Reddit)** está implementado en ba
   - `src/modules/social/services/social.service.spec.ts`
 - E2E:
   - `test/social.e2e-spec.ts`
+
+-----
+ **módulo D**.
+
+### Estado actual (implementado)
+
+El **Módulo D - Panel de Administración y Moderación** está implementado en backend con:
+
+- Gestión de usuarios (roles, activación y eliminación).
+- Suspensiones con historial y cierre.
+- CRUD de roles.
+- Árbol jerárquico de categorías (pensum).
+- Auditoría de acciones administrativas.
+- Moderación avanzada con eliminación de contenido reportado.
+
+### Endpoints del Módulo D (`/api/admin`)
+
+#### Usuarios y suspensiones
+
+- `GET /api/admin/users`
+- `PATCH /api/admin/users/:idUsuario/active`
+- `POST /api/admin/users/:idUsuario/roles`
+- `DELETE /api/admin/users/:idUsuario/roles/:nombreRol`
+- `DELETE /api/admin/users/:idUsuario`
+- `GET /api/admin/users/:idUsuario/suspensions`
+- `POST /api/admin/users/:idUsuario/suspensions`
+- `PATCH /api/admin/users/:idUsuario/suspensions/:idSuspension/close`
+
+#### Roles
+
+- `GET /api/admin/roles`
+- `POST /api/admin/roles`
+- `PATCH /api/admin/roles/:idRol`
+- `DELETE /api/admin/roles/:idRol`
+
+#### Categorías
+
+- `GET /api/admin/categories`
+- `GET /api/admin/categories/tree`
+- `POST /api/admin/categories`
+- `PATCH /api/admin/categories/:idCategoria`
+- `DELETE /api/admin/categories/:idCategoria`
+
+#### Moderación y auditoría
+
+- `GET /api/admin/moderation/reports`
+- `PATCH /api/admin/moderation/reports/:idReporte/status`
+- `DELETE /api/admin/moderation/threads/:idHilo`
+- `DELETE /api/admin/moderation/comments/:idComentario`
+- `DELETE /api/admin/moderation/articles/:idArticulo`
+- `DELETE /api/admin/moderation/projects/:idProyecto`
+- `GET /api/admin/audit`
+
+### Pruebas del Módulo D
+
+- Unitarias:
+  - `src/modules/admin/services/admin.service.spec.ts`
+- E2E:
+  - `test/admin.e2e-spec.ts`
  

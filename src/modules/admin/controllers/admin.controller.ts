@@ -190,4 +190,40 @@ export class AdminController {
   ) {
     return this.adminService.moderateReport(user, idReporte, dto);
   }
+
+  @Delete('moderation/threads/:idHilo')
+  async deleteThread(
+    @CurrentUser() user: JwtPayload,
+    @Param('idHilo', ParseIntPipe) idHilo: number,
+  ) {
+    await this.adminService.deleteThread(user, idHilo);
+    return { message: 'Hilo eliminado correctamente' };
+  }
+
+  @Delete('moderation/comments/:idComentario')
+  async deleteComment(
+    @CurrentUser() user: JwtPayload,
+    @Param('idComentario', ParseIntPipe) idComentario: number,
+  ) {
+    await this.adminService.deleteComment(user, idComentario);
+    return { message: 'Comentario eliminado correctamente' };
+  }
+
+  @Delete('moderation/articles/:idArticulo')
+  async deleteArticle(
+    @CurrentUser() user: JwtPayload,
+    @Param('idArticulo', ParseIntPipe) idArticulo: number,
+  ) {
+    await this.adminService.deleteArticle(user, idArticulo);
+    return { message: 'Artículo eliminado correctamente' };
+  }
+
+  @Delete('moderation/projects/:idProyecto')
+  async deleteProject(
+    @CurrentUser() user: JwtPayload,
+    @Param('idProyecto', ParseIntPipe) idProyecto: number,
+  ) {
+    await this.adminService.deleteProject(user, idProyecto);
+    return { message: 'Proyecto eliminado correctamente' };
+  }
 }
