@@ -179,7 +179,7 @@ export class ProjectsService {
     }
 
     if (options.categoryId) {
-      qb.andWhere('p.id_categoria = :catId', { catId: options.categoryId });
+      qb.andWhere('p.idCategoria = :catId', { catId: options.categoryId });
     }
 
     if (options.q) {
@@ -188,7 +188,7 @@ export class ProjectsService {
       });
     }
 
-    qb.orderBy('p.id_proyecto', 'DESC')
+    qb.orderBy('p.idProyecto', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 

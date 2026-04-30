@@ -110,6 +110,11 @@ export class AdminController {
     return this.adminService.listCategories(user);
   }
 
+  @Get('categories/areas')
+  listCategoryAreas(@CurrentUser() user: JwtPayload) {
+    return this.adminService.listAreaTecnicas(user);
+  }
+
   @Get('categories/tree')
   listCategoriesTree(@CurrentUser() user: JwtPayload) {
     return this.adminService.listCategoryTree(user);

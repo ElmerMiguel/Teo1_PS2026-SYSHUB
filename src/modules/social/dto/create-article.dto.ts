@@ -7,7 +7,7 @@ export class CreateArticleDto {
   titulo!: string;
 
   @IsString()
-  @Length(20, 50000)
+  @Length(5, 50000)
   contenidoHtml!: string;
 
   @IsOptional()

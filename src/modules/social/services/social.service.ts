@@ -75,12 +75,12 @@ export class SocialService {
       .createQueryBuilder('h')
       .leftJoinAndSelect('h.categoria', 'cat')
       .orderBy('h.fijado', 'DESC')
-      .addOrderBy('h.fecha_creacion', 'DESC')
+      .addOrderBy('h.fechaCreacion', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
     if (query.idCategoria) {
-      qb.andWhere('h.id_categoria = :idCategoria', {
+      qb.andWhere('h.idCategoria = :idCategoria', {
         idCategoria: query.idCategoria,
       });
     }
@@ -135,7 +135,7 @@ export class SocialService {
 
     const qb = this.articleRepository
       .createQueryBuilder('a')
-      .orderBy('a.fecha_publicacion', 'DESC')
+      .orderBy('a.fechaPublicacion', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -303,7 +303,7 @@ export class SocialService {
 
     const qb = this.reportRepository
       .createQueryBuilder('r')
-      .orderBy('r.fecha_reporte', 'DESC')
+      .orderBy('r.fechaReporte', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 

@@ -261,6 +261,11 @@ export class AdminService {
     });
   }
 
+  listAreaTecnicas(admin: JwtPayload) {
+    this.ensureAdminRole(admin.roles);
+    return Object.values(AreaTecnicaCategoria);
+  }
+
   async listCategoryTree(user: JwtPayload): Promise<CategoriaEntity[]> {
     this.ensureAdminOrModeratorRole(user.roles);
 

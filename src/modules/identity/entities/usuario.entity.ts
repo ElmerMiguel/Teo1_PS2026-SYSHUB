@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { RolEntity } from './rol.entity';
 import { SesionEntity } from './sesion.entity';
+import { MaterialGuardadoEntity } from './material-guardado.entity';
 
 @Entity('usuario')
 export class UsuarioEntity {
@@ -45,6 +46,12 @@ export class UsuarioEntity {
   @Column({ name: 'semestre', type: 'int', nullable: true })
   semestre?: number;
 
+  @Column({ name: 'failed_login_attempts', type: 'int', default: 0 })
+  failedLoginAttempts!: number;
+
+  @Column({ name: 'lock_until', type: 'timestamptz', nullable: true })
+  lockUntil?: Date;
+
   @ManyToMany(() => RolEntity, (rol) => rol.usuarios)
   @JoinTable({
     name: 'usuario_rol',
@@ -61,4 +68,7 @@ export class UsuarioEntity {
 
   @OneToMany(() => SesionEntity, (sesion) => sesion.usuario)
   sesiones!: SesionEntity[];
+
+  @OneToMany(() => MaterialGuardadoEntity, (material) => material.usuario)
+  materialGuardado!: MaterialGuardadoEntity[];
 }

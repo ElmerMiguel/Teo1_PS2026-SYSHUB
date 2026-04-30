@@ -38,7 +38,9 @@ CREATE TABLE USUARIO (
     activo BOOLEAN DEFAULT TRUE,
     foto_perfil VARCHAR(255),
     carnet VARCHAR(20),
-    semestre INT CHECK (semestre >= 1 AND semestre <= 15)
+    semestre INT CHECK (semestre >= 1 AND semestre <= 15),
+    failed_login_attempts INT DEFAULT 0,
+    lock_until TIMESTAMPTZ
 );
 
 CREATE TABLE CATEGORIA (
@@ -203,6 +205,15 @@ CREATE TABLE MATERIAL_GUARDADO (
     tipo_contenido tipo_contenido_guardado NOT NULL,
     id_contenido INT NOT NULL, -- ID genérico según diseño
     fecha_guardado TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE PASSWORD_RESET (
+    id_reset INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario INT NOT NULL REFERENCES USUARIO(id_usuario) ON DELETE CASCADE,
+    token_hash VARCHAR(255) NOT NULL,
+    fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    fecha_expiracion TIMESTAMPTZ NOT NULL,
+    usado BOOLEAN DEFAULT FALSE
 );
 
 -- Métricas de visibilidad por usuario único en proyectos
