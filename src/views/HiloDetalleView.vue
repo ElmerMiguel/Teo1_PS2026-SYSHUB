@@ -39,6 +39,9 @@
           <i class="bi bi-hand-thumbs-down"></i> <span class="text-sm font-medium">Downvote</span>
         </button>
         <span class="text-sm font-semibold">Score: {{ threadScore }}</span>
+        <button @click="saveThread" class="flex items-center gap-1 hover:text-primary-blue transition">
+          <i class="bi bi-bookmark"></i> <span class="text-sm font-medium">Guardar</span>
+        </button>
         <button @click="reportContent({ idHilo: thread.idHilo })" class="flex items-center gap-1 hover:text-red-500 transition">
           <i class="bi bi-flag"></i> <span class="text-sm font-medium">Reportar</span>
         </button>
@@ -216,6 +219,19 @@ const reportContent = async ({ idHilo, idComentario }) => {
     alert('Reporte enviado correctamente.')
   } catch (error) {
     alert('No se pudo enviar el reporte.')
+  }
+}
+
+const saveThread = async () => {
+  if (!thread.value?.idHilo) return
+  try {
+    await api.post('/auth/saved', {
+      tipoContenido: 'hilo',
+      idContenido: thread.value.idHilo
+    })
+    alert('Hilo guardado en tu material.')
+  } catch (error) {
+    alert('No se pudo guardar el hilo.')
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="text-lg font-medium text-gray-900 mb-6 text-center">Crea tu cuenta</h3>
-    <form class="space-y-4" @submit.prevent="handleRegister">
+  <form class="space-y-4" @submit.prevent="handleRegister">
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
@@ -49,6 +49,10 @@
       </div>
     </form>
 
+    <div v-if="message" class="mt-4 text-center text-sm text-blue-700 bg-blue-50 border border-blue-100 rounded-md p-3">
+      {{ message }}
+    </div>
+
     <div class="mt-6 text-center">
       <router-link to="/auth/login" class="text-sm font-medium text-primary-blue hover:text-blue-500">
         ¿Ya tienes cuenta? Inicia sesión
@@ -76,13 +80,19 @@ const form = ref({
 })
 
 const isLoading = ref(false)
+const message = ref('')
 
 const handleRegister = async () => {
   isLoading.value = true
   try {
     const res = await api.post('/auth/register', form.value)
-    authStore.setAuthDetails(res.data.accessToken, res.data.user)
-    router.push('/dashboard')
+    if (res.data?.accessToken) {
+      authStore.setAuthDetails(res.data.accessToken, res.data.user)
+      router.push('/dashboard')
+    } else {
+      message.value = res.data?.message || 'Cuenta creada. Espera activación del administrador.'
+      router.push('/auth/login')
+    }
   } catch (error) {
     alert(error.response?.data?.message || 'Error al registrar')
   } finally {

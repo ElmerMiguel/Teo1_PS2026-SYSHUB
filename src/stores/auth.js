@@ -7,9 +7,11 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isAuthenticated: (state) => !!state.token,
+    roles: (state) => state.user?.roles || [],
     isAdmin: (state) => state.user?.roles?.some(r => r === 'ADMINISTRADOR' || r === 'ADMIN'),
     isModerator: (state) => state.user?.roles?.some(r => r === 'MODERADOR' || r === 'MODERATOR'),
-    isAuxiliar: (state) => state.user?.roles?.includes('AUXILIAR')
+    isAuxiliar: (state) => state.user?.roles?.includes('AUXILIAR'),
+    isStudent: (state) => state.user?.roles?.includes('ESTUDIANTE')
   },
   actions: {
     setAuthDetails(token, user) {

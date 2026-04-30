@@ -11,7 +11,7 @@
       </ol>
     </nav>
 
-    <h2 class="text-3xl font-bold mb-8 text-gray-900">Subir Nuevo Proyecto</h2>
+  <h2 class="text-3xl font-bold mb-8 text-gray-900">Publicar Proyecto</h2>
 
     <!-- Stepper -->
     <div class="flex justify-between mb-10 relative px-4">
@@ -123,14 +123,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const currentStep = ref(1)
 const loading = ref(false)
 const categoriasLocales = ref([])
+
+
 
 onMounted(async () => {
   try {

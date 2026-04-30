@@ -25,9 +25,14 @@
           <i class="bi bi-folder-symlink"></i>
         </div>
         <div class="flex-grow">
-          <span class="text-[0.65rem] font-bold uppercase tracking-widest text-blue-600 mb-2 block">Material Guardado</span>
-          <a href="#" class="text-lg font-bold text-gray-900 hover:text-primary-blue transition mb-2 block">{{ item.titulo || 'Contenido' }}</a>
-          <p class="text-sm text-gray-500 mb-3 max-w-3xl line-clamp-2">Material guardado en tu colección para referencias futuras.</p>
+          <span class="text-[0.65rem] font-bold uppercase tracking-widest text-blue-600 mb-2 block">{{ getTypeLabel(item.tipoContenido) }}</span>
+          <router-link :to="getItemLink(item)" class="text-lg font-bold text-gray-900 hover:text-primary-blue transition mb-2 block">
+            {{ item.titulo || 'Contenido' }}
+          </router-link>
+          <p class="text-sm text-gray-500 mb-3 max-w-3xl line-clamp-2">Guardado el {{ new Date(item.fechaGuardado).toLocaleDateString() }}</p>
+        </div>
+        <div>
+          <button @click="removeSaved(item.idGuardado)" class="text-red-500 hover:text-red-700 text-sm font-semibold">Eliminar</button>
         </div>
       </div>
 
@@ -43,12 +48,40 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import api from '../services/api'
 
 const savedItems = ref([])
 
 onMounted(async () => {
-  // Cuando se implemente el guardado en db, consumir: await api.get('/auth/saved')
-  // Por el momento se deja referenciado a vacio porque la bd esta en blanco
-  savedItems.value = []
+  try {
+    const res = await api.get('/auth/saved')
+    savedItems.value = res.data.items || res.data || []
+  } catch (error) {
+    savedItems.value = []
+  }
 })
+
+const removeSaved = async (idGuardado) => {
+  if (!confirm('¿Eliminar este material guardado?')) return
+  try {
+    await api.delete(`/auth/saved/${idGuardado}`)
+    savedItems.value = savedItems.value.filter((item) => item.idGuardado !== idGuardado)
+  } catch (error) {
+    alert('No se pudo eliminar el material guardado.')
+  }
+}
+
+const getTypeLabel = (tipo) => {
+  if (tipo === 'proyecto') return 'Proyecto'
+  if (tipo === 'hilo') return 'Hilo'
+  if (tipo === 'articulo') return 'Artículo'
+  return 'Material Guardado'
+}
+
+const getItemLink = (item) => {
+  if (item.tipoContenido === 'proyecto') return `/proyectos/${item.idContenido}`
+  if (item.tipoContenido === 'hilo') return `/foros/${item.idContenido}`
+  if (item.tipoContenido === 'articulo') return `/blogs/${item.idContenido}`
+  return '/guardados'
+}
 </script>

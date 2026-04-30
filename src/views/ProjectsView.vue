@@ -5,8 +5,8 @@
         <h2 class="text-3xl font-bold text-gray-900">Repositorio de Proyectos</h2>
         <p class="text-gray-500">Explora proyectos técnicos de la comunidad y filtra por tags o categoría.</p>
       </div>
-      <router-link to="/crear-repo" class="bg-primary-blue hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition">
-        Subir Proyecto
+      <router-link v-if="authStore.isStudent" to="/crear-repo" class="bg-primary-blue hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition">
+        Publicar Proyecto
       </router-link>
     </div>
 
@@ -62,11 +62,13 @@
 import { ref, onMounted, computed } from 'vue'
 import api from '../services/api'
 import ProjectCard from '../components/ProjectCard.vue'
+import { useAuthStore } from '../stores/auth'
 
 const projects = ref([])
 const categories = ref([])
 const tags = ref([])
 const loading = ref(false)
+const authStore = useAuthStore()
 
 const pagination = ref({ page: 1, limit: 9, total: 0 })
 
@@ -78,6 +80,7 @@ const filters = ref({
 })
 
 const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.limit))
+
 
 const fetchCatalogs = async () => {
   const [cats, tagsRes] = await Promise.all([
@@ -110,7 +113,14 @@ const fetchProjects = async () => {
     pagination.value.total = res.data.total || 0
   } catch (error) {
     console.error('Error cargando proyectos', error)
-    projects.value = []
+    try {
+      const fallback = await api.get('/projects')
+      projects.value = fallback.data.items || fallback.data || []
+      pagination.value = { page: 1, limit: projects.value.length, total: projects.value.length }
+    } catch (fallbackError) {
+      console.error('Error cargando proyectos (fallback)', fallbackError)
+      projects.value = []
+    }
   } finally {
     loading.value = false
   }

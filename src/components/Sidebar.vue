@@ -22,10 +22,10 @@
         </a>
       </router-link>
       
-      <router-link to="/crear-repo" custom v-slot="{ isActive, navigate, href }">
+      <router-link v-if="authStore.isStudent" to="/crear-repo" custom v-slot="{ isActive, navigate, href }">
         <a :href="href" @click="navigate" :class="navClass(isActive)">
           <i class="bi bi-cloud-arrow-up-fill text-lg w-6 mr-3 text-center"></i>
-          Crear Proyecto
+          Publicar Proyecto
         </a>
       </router-link>
       
@@ -51,7 +51,7 @@
       </router-link>
 
       <!-- Admin Panel link if Admin -->
-  <div v-if="authStore.isAdmin || authStore.isModerator">
+      <div v-if="authStore.isAdmin || authStore.isModerator">
         <hr class="mx-6 my-4 border-gray-200" />
         <router-link to="/admin" custom v-slot="{ isActive, navigate, href }">
           <a :href="href" @click="navigate" :class="navClass(isActive)">
@@ -66,9 +66,12 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
+
+
 
 const navClass = (isActive) => {
   const base = "flex items-center px-6 py-3 text-sm font-medium transition-colors border-r-4 "

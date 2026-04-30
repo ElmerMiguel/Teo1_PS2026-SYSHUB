@@ -26,6 +26,9 @@
         <button @click="voteArticle('downvote')" class="flex items-center gap-1 hover:text-red-500 transition">
           <i class="bi bi-hand-thumbs-down"></i> <span class="text-sm font-medium">Downvote</span>
         </button>
+        <button @click="saveArticle" class="flex items-center gap-1 hover:text-primary-blue transition">
+          <i class="bi bi-bookmark"></i> <span class="text-sm font-medium">Guardar</span>
+        </button>
         <span class="text-sm font-semibold">Score: {{ articleScore }}</span>
       </div>
     </div>
@@ -146,6 +149,19 @@ const reportComment = async (idComentario) => {
     alert('Reporte enviado correctamente.')
   } catch (error) {
     alert('No se pudo enviar el reporte.')
+  }
+}
+
+const saveArticle = async () => {
+  if (!article.value?.idArticulo) return
+  try {
+    await api.post('/auth/saved', {
+      tipoContenido: 'articulo',
+      idContenido: article.value.idArticulo
+    })
+    alert('Artículo guardado en tu material.')
+  } catch (error) {
+    alert('No se pudo guardar el artículo.')
   }
 }
 

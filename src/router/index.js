@@ -32,7 +32,9 @@ const routes = [
     meta: { requiresGuest: true },
     children: [
       { path: 'login', name: 'Login', component: () => import('../views/auth/LoginView.vue') },
-      { path: 'register', name: 'Register', component: () => import('../views/auth/RegisterView.vue') }
+      { path: 'register', name: 'Register', component: () => import('../views/auth/RegisterView.vue') },
+      { path: 'forgot', name: 'ForgotPassword', component: () => import('../views/auth/ForgotPasswordView.vue') },
+      { path: 'reset', name: 'ResetPassword', component: () => import('../views/auth/ResetPasswordView.vue') }
     ]
   }
 ]

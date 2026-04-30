@@ -69,24 +69,28 @@ const recentArticles = ref([])
 onMounted(async () => {
   try {
     // Puedes traer las estadísticas reales desde tu GET /api/auth/me u otro endpoint
-    const meRes = await api.get('/auth/me');
-    if (meRes.data && (meRes.data.user || meRes.data.idUsuario)) {
-      // stats.value = meRes.data.stats || { proyectos: 0, comentarios: 0, guardados: 0 }
+    const meRes = await api.get('/auth/me')
+    if (meRes.data?.stats) {
+      stats.value = {
+        proyectos: meRes.data.stats.proyectos ?? 0,
+        comentarios: meRes.data.stats.respuestas ?? 0,
+        guardados: meRes.data.stats.guardados ?? 0
+      }
     }
 
     // Proyectos recientes
-    const projectsRes = await api.get('/projects/curated');
+    const projectsRes = await api.get('/projects/curated')
     recentProjects.value = Array.isArray(projectsRes.data)
       ? projectsRes.data
-      : (projectsRes.data.items || []);
+      : (projectsRes.data.items || [])
 
     // Hilos recientes
-  const threadsRes = await api.get('/social/threads?limit=4');
-  recentThreads.value = threadsRes.data.items || threadsRes.data || [];
+  const threadsRes = await api.get('/social/threads?limit=4')
+  recentThreads.value = threadsRes.data.items || threadsRes.data || []
 
     // Artículos recientes
-  const articlesRes = await api.get('/social/articles?limit=2');
-  recentArticles.value = articlesRes.data.items || articlesRes.data || [];
+  const articlesRes = await api.get('/social/articles?limit=2')
+  recentArticles.value = articlesRes.data.items || articlesRes.data || []
   } catch (error) {
     console.error('Error cargando el Dashboard:', error);
   }

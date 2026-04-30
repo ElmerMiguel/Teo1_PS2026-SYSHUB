@@ -12,8 +12,10 @@
           <h2 class="text-3xl font-bold text-gray-900">{{ project.titulo }}</h2>
           <p class="text-gray-500 text-sm mt-2">Categoría: {{ project.categoria?.nombre || 'Sin categoría' }}</p>
         </div>
-        <div class="text-sm text-gray-600">
-          <span class="font-semibold">Estado:</span> {{ project.estado }} · <span class="font-semibold">Vistas:</span> {{ project.vistas || 0 }}
+        <div class="text-sm text-gray-600 flex items-center gap-4">
+          <span><span class="font-semibold">Estado:</span> {{ project.estado }}</span>
+          <span><span class="font-semibold">Vistas:</span> {{ project.vistas || 0 }}</span>
+          <button @click="saveProject" class="text-primary-blue font-medium hover:underline">Guardar</button>
         </div>
       </div>
 
@@ -155,6 +157,19 @@ const submitCuration = async () => {
     alert('Curaduría actualizada correctamente.')
   } catch (error) {
     alert('No se pudo actualizar la curaduría.')
+  }
+}
+
+const saveProject = async () => {
+  if (!project.value?.idProyecto) return
+  try {
+    await api.post('/auth/saved', {
+      tipoContenido: 'proyecto',
+      idContenido: project.value.idProyecto
+    })
+    alert('Proyecto guardado en tu material.')
+  } catch (error) {
+    alert('No se pudo guardar el proyecto.')
   }
 }
 

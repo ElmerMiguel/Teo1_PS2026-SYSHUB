@@ -39,9 +39,9 @@
         </div>
 
         <div class="text-sm">
-          <a href="#" class="font-medium text-primary-blue hover:text-blue-500">
+          <router-link to="/auth/forgot" class="font-medium text-primary-blue hover:text-blue-500">
             ¿Olvidaste tu contraseña?
-          </a>
+          </router-link>
         </div>
       </div>
 
