@@ -28,48 +28,25 @@
           </select>
         </div>
 
-        <div class="flex border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer">
-          <div class="w-16 bg-gray-50 flex flex-col items-center justify-center py-4 border-r border-gray-200">
-            <button class="text-primary-blue hover:text-blue-700 font-bold">▲</button>
-            <span class="font-bold my-1 text-gray-900">156</span>
-            <button class="text-gray-400 hover:text-gray-600 font-bold">▼</button>
-          </div>
-          <div class="p-4 flex-1">
-            <div class="mb-1 flex gap-2 items-center">
-              <span class="text-[0.7rem] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">Avisos Oficiales</span>
-              <span class="text-[0.7rem] font-bold px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 border border-yellow-200">📌 Destacado</span>
-            </div>
-            <h5 class="font-bold text-gray-900 mb-1">Reglas generales de Sys-Reddit y fechas importantes Semestre 2026-1</h5>
-            <p class="text-xs text-gray-500 mb-2 truncate">Bienvenidos al foro. Por favor lean las normas de convivencia técnica y recuerden los hitos del semestre...</p>
-            <div class="text-xs text-gray-500">
-              por <span class="text-primary-blue font-medium">admin_usac</span> · hace 1 semana · 💬 45 respuestas · 👁️ 2.1k vistas
-            </div>
-          </div>
-        </div>
-
-        <div class="flex border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer">
-          <div class="w-16 bg-gray-50 flex flex-col items-center justify-center py-4 border-r border-gray-200">
-            <button class="text-primary-blue hover:text-blue-700 font-bold">▲</button>
-            <span class="font-bold my-1 text-gray-900">47</span>
-            <button class="text-gray-400 hover:text-gray-600 font-bold">▼</button>
-          </div>
-          <div class="p-4 flex-1">
-            <div class="mb-1 flex gap-2 items-center">
-              <span class="text-[0.7rem] font-bold px-2 py-0.5 rounded bg-cyan-100 text-cyan-800">Desarrollo Web</span>
-            </div>
-            <h5 class="font-bold text-gray-900 mb-1">¿Cómo manejar autenticación con JWT en Express?</h5>
-            <p class="text-xs text-gray-500 mb-2 truncate">Estoy atorado en la Práctica 2, logro generar el token pero en el middleware me da error de firma inválida...</p>
-            <div class="text-xs text-gray-500">
-              por <span class="text-primary-blue font-medium">carlos_dev</span> · hace 3 horas · 💬 12 respuestas · 👁️ 340 vistas
-            </div>
-          </div>
+        <ForumRow v-for="t in threads" :key="t.idHilo" :thread="t" />
+        
+        <div v-if="threads.length === 0" class="p-8 text-center text-gray-500">
+          No hay hilos o foros disponibles.
         </div>
       </div>
+      
+      <!-- Modal Component -->
+      <CrearHiloModal 
+        :isOpen="isModalOpen" 
+        @close="isModalOpen = false" 
+        @created="fetchThreads" 
+      />
+
     </div>
 
     <!-- Right Column: Sidebar Widgets -->
     <div class="hidden lg:block w-80">
-      <button class="w-full bg-primary-blue hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl mb-6 shadow-sm transition">
+      <button @click="createNewThread" class="w-full bg-primary-blue hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl mb-6 shadow-sm transition">
         ＋ Crear Nuevo Hilo
       </button>
 
@@ -105,4 +82,28 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import api from '../services/api'
+import ForumRow from '../components/ForumRow.vue'
+import CrearHiloModal from '../components/CrearHiloModal.vue'
+
+const threads = ref([])
+const isModalOpen = ref(false)
+
+const fetchThreads = async () => {
+  try {
+    const res = await api.get('/social/threads');
+    threads.value = res.data.items || res.data || [];
+  } catch (error) {
+    console.error('Error cargando hilos:', error);
+  }
+}
+
+onMounted(() => {
+  fetchThreads()
+})
+
+const createNewThread = () => {
+  isModalOpen.value = true
+}
 </script>

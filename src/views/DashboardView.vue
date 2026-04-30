@@ -51,7 +51,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import ProjectCard from '../components/ProjectCard.vue'
 import ForumRow from '../components/ForumRow.vue'
@@ -59,24 +60,33 @@ import ArticleCard from '../components/ArticleCard.vue'
 
 const authStore = useAuthStore()
 
-// Mock data (En un sistema real se llama al API)
-const stats = ref({ proyectos: 12, comentarios: 34, guardados: 8 })
+// Reactividad para datos traídos del backend
+const stats = ref({ proyectos: 0, comentarios: 0, guardados: 0 })
+const recentProjects = ref([])
+const recentThreads = ref([])
+const recentArticles = ref([])
 
-const recentProjects = ref([
-  { idProyecto: 1, titulo: 'Sistema de Gestión de Inventarios', descripcion: 'CRUD completo en Django', etiquetas: ['Python', 'Django', 'PostgreSQL'], usuario: { nombre: 'Ana Martínez' } },
-  { idProyecto: 2, titulo: 'Red Neuronal Clasificadora', descripcion: 'Clasificador de imágenes', etiquetas: ['Jupyter', 'TensorFlow'], usuario: { nombre: 'Carlos Pérez' } },
-  { idProyecto: 3, titulo: 'Simulador de SO en C', descripcion: 'Simulador planificador', etiquetas: ['C', 'Linux', 'Bash'], usuario: { nombre: 'Luis Gómez' } }
-])
+onMounted(async () => {
+  try {
+    // Puedes traer las estadísticas reales desde tu GET /api/auth/me u otro endpoint
+    const meRes = await api.get('/auth/me');
+    if (meRes.data && meRes.data.user) {
+      // stats.value = meRes.data.stats || { proyectos: 0, comentarios: 0, guardados: 0 }
+    }
 
-const recentThreads = ref([
-  { idHilo: 1, titulo: '¿Cómo implementar JWT en Node.js?', categoria: { nombre: 'Desarrollo Web' }, respuestas: 15, vistas: 203, usuario: { nombre: 'Juan Ramírez' } },
-  { idHilo: 2, titulo: 'Duda con árbol AVL en C++', categoria: { nombre: 'Estructuras' }, respuestas: 4, vistas: 89, usuario: { nombre: 'María Solís' } },
-  { idHilo: 3, titulo: 'Recomendación VPS económico para la U', categoria: { nombre: 'Infraestructura' }, respuestas: 21, vistas: 410, usuario: { nombre: 'Pablo López' } },
-  { idHilo: 4, titulo: 'Docker compose no conecta con PostgreSQL', categoria: { nombre: 'Bases de Datos' }, respuestas: 8, vistas: 156, usuario: { nombre: 'Roberto Cruz' } }
-])
+    // Proyectos recientes
+    const projectsRes = await api.get('/projects?limit=3');
+    recentProjects.value = projectsRes.data.items || [];
 
-const recentArticles = ref([
-  { idArticulo: 1, titulo: 'Clean Code en Proyectos Universitarios', resumen: 'Aplicar buenas prácticas desde el inicio...', usuario: { nombre: 'Ing. Carlos Torres' } },
-  { idArticulo: 2, titulo: 'Introducción a GitHub Actions', resumen: 'Automatiza pruebas y despliegues...', usuario: { nombre: 'Aux. Silvia Pineda' } }
-])
+    // Hilos recientes
+    const threadsRes = await api.get('/social/threads?limit=4');
+    recentThreads.value = threadsRes.data.items || [];
+
+    // Artículos recientes
+    const articlesRes = await api.get('/social/articles?limit=2');
+    recentArticles.value = articlesRes.data.items || [];
+  } catch (error) {
+    console.error('Error cargando el Dashboard:', error);
+  }
+})
 </script>

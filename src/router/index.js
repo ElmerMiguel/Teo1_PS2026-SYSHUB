@@ -13,10 +13,12 @@ const routes = [
     children: [
       { path: 'dashboard', name: 'Dashboard', component: () => import('../views/DashboardView.vue') },
       { path: 'foros', name: 'Foros', component: () => import('../views/ForosView.vue') },
+      { path: 'foros/:id', name: 'HiloDetalle', component: () => import('../views/HiloDetalleView.vue') },
       { path: 'crear-repo', name: 'CrearRepo', component: () => import('../views/CrearRepoView.vue') },
       { path: 'perfil', name: 'Perfil', component: () => import('../views/PerfilView.vue') },
       { path: 'blogs', name: 'Blogs', component: () => import('../views/BlogsView.vue') },
       { path: 'guardados', name: 'Guardados', component: () => import('../views/GuardadosView.vue') },
+      { path: 'admin', name: 'Admin', component: () => import('../views/AdminDashboardView.vue'), meta: { requiresAdmin: true } }
     ]
   },
 
@@ -43,6 +45,8 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/auth/login')
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next('/dashboard')
+  } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
     next('/dashboard')
   } else {
     next()

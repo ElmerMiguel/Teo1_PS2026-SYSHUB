@@ -6,7 +6,7 @@
         <h2 class="text-3xl font-bold text-gray-900 mb-1">Blogs y Artículos</h2>
         <p class="text-gray-500">Tutoriales, investigaciones y guías de la comunidad.</p>
       </div>
-      <button class="bg-primary-blue hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition flex items-center">
+      <button @click="createArticle" v-if="authStore.isAuxiliar || authStore.isAdmin" class="bg-primary-blue hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition flex items-center">
         <i class="bi bi-pen mr-2"></i> Escribir Artículo
       </button>
     </div>
@@ -52,70 +52,68 @@
     <!-- Blog Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
       
-      <!-- Card 1 -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
-        <div class="h-48 bg-yellow-200"></div>
+      <div v-for="a in articles" :key="a.idArticulo" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
+        <div class="h-48 bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center text-4xl text-blue-500 font-bold">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
         <div class="p-6 flex flex-col flex-grow">
           <div class="flex justify-between items-center mb-3">
-            <span class="bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Tutorial</span>
+            <span class="bg-blue-50 text-blue-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Artículo</span>
             <i class="bi bi-bookmark text-gray-400 hover:text-primary-blue cursor-pointer"></i>
           </div>
-          <h4 class="text-xl font-bold text-gray-900 mb-3 leading-snug">Clean Code aplicado en Java para Estructuras de Datos</h4>
-          <p class="text-gray-600 text-sm mb-6 line-clamp-3">Tener código limpio facilita el momento de calificar. Revisaremos los principios de Robert C. Martin aplicados específicamente a nodos, árboles y listas en la Práctica 1.</p>
+          <h4 class="text-xl font-bold text-gray-900 mb-3 leading-snug">{{ a.titulo }}</h4>
+          <p class="text-gray-600 text-sm mb-6 line-clamp-3" v-html="a.resumen || a.contenidoHtml || 'Sin descripción'"></p>
           <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold text-[10px]">AM</div>
-              <span class="text-sm text-gray-900 font-medium">Ana Martínez</span>
+              <div class="w-6 h-6 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold text-[10px]">
+                {{ a.usuario?.nombre?.charAt(0) || 'U' }}
+              </div>
+              <span class="text-sm text-gray-900 font-medium">{{ a.usuario?.nombre || 'Usuario' }}</span>
             </div>
-            <span class="text-xs text-gray-500">5 min lect.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
-        <div class="h-48 bg-cyan-200"></div>
-        <div class="p-6 flex flex-col flex-grow">
-          <div class="flex justify-between items-center mb-3">
-            <span class="bg-cyan-50 text-cyan-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">DevOps</span>
-            <i class="bi bi-bookmark-fill text-primary-blue cursor-pointer"></i>
-          </div>
-          <h4 class="text-xl font-bold text-gray-900 mb-3 leading-snug">Introducción a GitHub Actions para Entregas de Laboratorio</h4>
-          <p class="text-gray-600 text-sm mb-6 line-clamp-3">Automatiza pruebas unitarias (Jest/JUnit) y despliegues cada vez que hagas un push a la rama main. Ahorra tiempo en tus evaluaciones finales.</p>
-          <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-[10px]">SP</div>
-              <span class="text-sm text-gray-900 font-medium">Silvia Pineda</span>
-            </div>
-            <span class="text-xs text-gray-500">8 min lect.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
-        <div class="h-48 bg-purple-200"></div>
-        <div class="p-6 flex flex-col flex-grow">
-          <div class="flex justify-between items-center mb-3">
-            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Investigación</span>
-            <i class="bi bi-bookmark text-gray-400 hover:text-primary-blue cursor-pointer"></i>
-          </div>
-          <h4 class="text-xl font-bold text-gray-900 mb-3 leading-snug">El futuro de los Compiladores con Inteligencia Artificial</h4>
-          <p class="text-gray-600 text-sm mb-6 line-clamp-3">Un análisis profundo de cómo los LLMs están revolucionando el análisis léxico y sintáctico, y qué significa esto para la materia de Organización de Lenguajes.</p>
-          <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-[10px]">CD</div>
-              <span class="text-sm text-gray-900 font-medium">Carlos Dev</span>
-            </div>
-            <span class="text-xs text-gray-500">15 min lect.</span>
           </div>
         </div>
       </div>
 
     </div>
 
+    <!-- Modal para crear artículo -->
+    <CrearArticuloModal 
+      :isOpen="isModalOpen" 
+      @close="isModalOpen = false" 
+      @created="fetchArticles" 
+    />
+
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import api from '../services/api'
+import { useAuthStore } from '../stores/auth'
+import CrearArticuloModal from '../components/CrearArticuloModal.vue'
+
+const articles = ref([])
+const authStore = useAuthStore()
+const isModalOpen = ref(false)
+
+const fetchArticles = async () => {
+  try {
+    const res = await api.get('/social/articles')
+    articles.value = res.data.items || res.data || []
+  } catch (error) {
+    console.error('Error fetching articles:', error)
+  }
+}
+
+onMounted(() => {
+  fetchArticles()
+})
+
+const createArticle = () => {
+  if (!authStore.isAuxiliar && !authStore.isAdmin) {
+    alert('Solo auxiliares y administradores pueden redactar artículos.')
+    return
+  }
+  isModalOpen.value = true
+}
 </script>

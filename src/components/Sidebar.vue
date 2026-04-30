@@ -43,13 +43,15 @@
         </a>
       </router-link>
 
-      <!-- Admin Panel link if Admin or Auxiliar -->
-      <div v-if="authStore.isAdmin || authStore.isAuxiliar">
+      <!-- Admin Panel link if Admin -->
+      <div v-if="authStore.isAdmin">
         <hr class="mx-6 my-4 border-gray-200" />
-        <a href="#" class="flex items-center px-6 py-2 text-sm font-medium text-gray-400 hover:text-gray-700 transition cursor-not-allowed" title="Próximamente">
-          <i class="bi bi-gear-fill text-lg w-6 mr-3 text-center"></i>
-          Administración
-        </a>
+        <router-link to="/admin" custom v-slot="{ isActive, navigate, href }">
+          <a :href="href" @click="navigate" :class="navClass(isActive)">
+            <i class="bi bi-gear-fill text-lg w-6 mr-3 text-center"></i>
+            Panel de Control
+          </a>
+        </router-link>
       </div>
 
     </nav>
