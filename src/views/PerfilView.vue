@@ -99,7 +99,9 @@ const isModalOpen = ref(false)
 const fetchProfile = async () => {
   try {
     const res = await api.get('/auth/me')
-    meData.value = res.data
+    meData.value = res.data?.user
+      ? res.data
+      : { user: res.data, stats: res.data?.stats }
   } catch(e) {
     console.error('Error fetching profile', e)
   }

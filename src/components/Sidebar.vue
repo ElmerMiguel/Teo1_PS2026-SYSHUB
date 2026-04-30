@@ -7,6 +7,13 @@
           Dashboard
         </a>
       </router-link>
+
+      <router-link to="/proyectos" custom v-slot="{ isActive, navigate, href }">
+        <a :href="href" @click="navigate" :class="navClass(isActive)">
+          <i class="bi bi-folder2-open text-lg w-6 mr-3 text-center"></i>
+          Proyectos
+        </a>
+      </router-link>
       
       <router-link to="/perfil" custom v-slot="{ isActive, navigate, href }">
         <a :href="href" @click="navigate" :class="navClass(isActive)">
@@ -44,7 +51,7 @@
       </router-link>
 
       <!-- Admin Panel link if Admin -->
-      <div v-if="authStore.isAdmin">
+  <div v-if="authStore.isAdmin || authStore.isModerator">
         <hr class="mx-6 my-4 border-gray-200" />
         <router-link to="/admin" custom v-slot="{ isActive, navigate, href }">
           <a :href="href" @click="navigate" :class="navClass(isActive)">

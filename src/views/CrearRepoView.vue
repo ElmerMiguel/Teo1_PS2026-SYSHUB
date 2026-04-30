@@ -49,17 +49,24 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="block font-medium text-gray-700 text-sm mb-2">Categoría Principal <span class="text-red-500">*</span></label>
-            <select v-model="form.idCategoria" required class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 focus:ring-primary-blue focus:border-primary-blue outline-none">
+            <select v-model="form.idCategoria" class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 focus:ring-primary-blue focus:border-primary-blue outline-none">
               <option value="">Seleccionar...</option>
-              <option value="1">Desarrollo Web</option>
-              <option value="2">IA y Machine Learning</option>
-              <option value="3">Infraestructura</option>
+              <option v-for="cat in categoriasLocales" :key="cat.idCategoria" :value="cat.idCategoria">
+                {{ cat.nombre }}
+              </option>
             </select>
+            <p v-if="categoriasLocales.length === 0" class="text-xs text-red-500 mt-1">Base de datos sin categorías.</p>
           </div>
           <div>
             <label class="block font-medium text-gray-700 text-sm mb-2">Lenguajes Base (Ej. JS, Python)</label>
             <input v-model="form.lenguajes" type="text" class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 focus:ring-primary-blue shadow-sm outline-none" placeholder="Separado por comas">
           </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 text-sm mb-2">Etiquetas (tags) <span class="text-red-500">*</span></label>
+          <input v-model="form.etiquetas" type="text" class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 focus:ring-primary-blue shadow-sm outline-none" placeholder="Ej: Java, Grafos, Compiladores">
+          <p class="text-xs text-gray-500 mt-1">Separa las etiquetas por coma. Mínimo 1 etiqueta.</p>
         </div>
 
         <div class="flex justify-between mt-10">
@@ -116,19 +123,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
 
 const router = useRouter()
 const currentStep = ref(1)
 const loading = ref(false)
+const categoriasLocales = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/projects/categories')
+    categoriasLocales.value = res.data.items || res.data || []
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+  }
+})
 
 const form = ref({
   titulo: '',
   descripcion: '',
   idCategoria: '',
-  lenguajes: ''
+  lenguajes: '',
+  etiquetas: ''
 })
 
 const selectedFile = ref(null)
@@ -142,13 +160,38 @@ const handleFileUpload = (e) => {
 const submitProject = async () => {
   loading.value = true
   try {
+    const etiquetas = form.value.etiquetas
+      ? form.value.etiquetas.split(',').map(t => t.trim()).filter(Boolean)
+      : []
+    const lenguajes = form.value.lenguajes
+      ? form.value.lenguajes.split(',').map(l => l.trim()).filter(Boolean)
+      : []
+
+    if (etiquetas.length === 0) {
+      alert('Debes ingresar al menos una etiqueta.')
+      loading.value = false
+      return
+    }
+
+    if (lenguajes.length === 0) {
+      alert('Debes ingresar al menos un lenguaje o tecnología en el stack.')
+      loading.value = false
+      return
+    }
+
+    if (!selectedFile.value) {
+      alert('Debes adjuntar un archivo PDF o ZIP antes de publicar.')
+      loading.value = false
+      return
+    }
+
     // 1. Crear el proyecto en DB
     const res = await api.post('/projects', {
       titulo: form.value.titulo,
       descripcion: form.value.descripcion,
-      idCategoria: parseInt(form.value.idCategoria),
-      stackTecnologico: { lenguajes: form.value.lenguajes.split(',').map(l => l.trim()) },
-      etiquetas: []
+      idCategoria: form.value.idCategoria ? parseInt(form.value.idCategoria) : undefined,
+      stackTecnologico: { lenguajes },
+      etiquetas
     })
     
     const projId = res.data.idProyecto || res.data.id;

@@ -34,6 +34,8 @@ const colorSidebar = computed(() => {
 })
 
 const authorName = computed(() => {
-  return props.article.usuario?.nombre ? `${props.article.usuario.nombre}` : 'Autor'
+  return props.article.usuario?.nombre
+    ? `${props.article.usuario.nombre}`
+    : `Autor #${props.article.idAutor || 'N/A'}`
 })
 </script>

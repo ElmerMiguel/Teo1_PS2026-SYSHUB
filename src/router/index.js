@@ -12,11 +12,14 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       { path: 'dashboard', name: 'Dashboard', component: () => import('../views/DashboardView.vue') },
+  { path: 'proyectos', name: 'Proyectos', component: () => import('../views/ProjectsView.vue') },
+  { path: 'proyectos/:id', name: 'ProyectoDetalle', component: () => import('../views/ProjectDetailView.vue') },
       { path: 'foros', name: 'Foros', component: () => import('../views/ForosView.vue') },
       { path: 'foros/:id', name: 'HiloDetalle', component: () => import('../views/HiloDetalleView.vue') },
       { path: 'crear-repo', name: 'CrearRepo', component: () => import('../views/CrearRepoView.vue') },
       { path: 'perfil', name: 'Perfil', component: () => import('../views/PerfilView.vue') },
       { path: 'blogs', name: 'Blogs', component: () => import('../views/BlogsView.vue') },
+  { path: 'blogs/:id', name: 'BlogDetalle', component: () => import('../views/BlogDetailView.vue') },
       { path: 'guardados', name: 'Guardados', component: () => import('../views/GuardadosView.vue') },
       { path: 'admin', name: 'Admin', component: () => import('../views/AdminDashboardView.vue'), meta: { requiresAdmin: true } }
     ]
@@ -46,7 +49,7 @@ router.beforeEach((to, from, next) => {
     next('/auth/login')
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next('/dashboard')
-  } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+  } else if (to.meta.requiresAdmin && !(authStore.isAdmin || authStore.isModerator)) {
     next('/dashboard')
   } else {
     next()

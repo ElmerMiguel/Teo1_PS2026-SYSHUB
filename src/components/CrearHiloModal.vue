@@ -18,13 +18,13 @@
         
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-          <select required v-model="form.idCategoria" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary-blue bg-gray-50">
+          <select v-model="form.idCategoria" class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary-blue bg-gray-50">
             <option value="" disabled>Selecciona un área...</option>
-            <option value="1">Desarrollo Web</option>
-            <option value="2">IA y Machine Learning</option>
-            <option value="3">Infraestructura y Redes</option>
-            <option value="4">Bases de Datos</option>
+            <option v-for="cat in categoriasLocales" :key="cat.idCategoria" :value="cat.idCategoria">
+              {{ cat.nombre }}
+            </option>
           </select>
+          <p v-if="categoriasLocales.length === 0" class="text-xs text-red-500 mt-1">No hay categorías en base de datos. Pide al admin registrarlas.</p>
         </div>
 
         <div>
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '../services/api'
 
 const emit = defineEmits(['close', 'created'])
@@ -61,6 +61,16 @@ const form = ref({
   contenido: ''
 })
 const loading = ref(false)
+const categoriasLocales = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/projects/categories')
+    categoriasLocales.value = res.data.items || res.data || []
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+  }
+})
 
 const close = () => {
   emit('close')
@@ -72,7 +82,7 @@ const submitThread = async () => {
     await api.post('/social/threads', {
       titulo: form.value.titulo,
       contenido: form.value.contenido,
-      idCategoria: parseInt(form.value.idCategoria)
+      idCategoria: form.value.idCategoria ? parseInt(form.value.idCategoria) : undefined
     })
     
     // reset form

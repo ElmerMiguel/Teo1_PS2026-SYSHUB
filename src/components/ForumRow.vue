@@ -50,9 +50,9 @@ const categoryBadgeClass = computed(() => {
   return 'bg-gray-100 text-gray-700'
 })
 
-const authorName = computed(() => props.thread.usuario?.nombre || 'Usuario')
-const userInitials = computed(() => authorName.value.substring(0,2).toUpperCase())
-const timeAgo = computed(() => 'hace poco') // En un real usariamos date-fns
+const authorName = computed(() => `Usuario #${props.thread.idUsuario || 'N/A'}`)
+const userInitials = computed(() => authorName.value.replace('Usuario #', 'U').substring(0,2).toUpperCase())
+const timeAgo = computed(() => props.thread.fechaCreacion ? new Date(props.thread.fechaCreacion).toLocaleDateString() : 'reciente')
 
 const avatarColor = computed(() => {
   const colors = ['#6b7280', '#ec4899', '#f59e0b', '#3b82f6']

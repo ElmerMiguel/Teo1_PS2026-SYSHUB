@@ -5,11 +5,11 @@
       <p class="text-gray-500">Gestión sistémica de usuarios, foros y registros de auditoría (Módulo D).</p>
     </div>
 
-    <!-- Tabs Administrativas -->
-    <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-xl overflow-hidden shadow-sm">
-      <button @click="currentTab = 'usuarios'" :class="['px-6 py-4 font-semibold focus:outline-none', currentTab === 'usuarios' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Usuarios Registrados</button>
-      <button @click="currentTab = 'moderacion'" :class="['px-6 py-4 font-semibold focus:outline-none', currentTab === 'moderacion' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Moderación de Reportes</button>
-      <button @click="currentTab = 'auditoria'" :class="['px-6 py-4 font-semibold focus:outline-none', currentTab === 'auditoria' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Auditoría General</button>
+    <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-xl overflow-hidden shadow-sm overflow-x-auto">
+      <button @click="currentTab = 'usuarios'" :class="['px-6 py-4 font-semibold whitespace-nowrap focus:outline-none', currentTab === 'usuarios' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Usuarios</button>
+      <button @click="currentTab = 'categorias'" :class="['px-6 py-4 font-semibold whitespace-nowrap focus:outline-none', currentTab === 'categorias' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Categorías (Pensum)</button>
+      <button @click="currentTab = 'moderacion'" :class="['px-6 py-4 font-semibold whitespace-nowrap focus:outline-none', currentTab === 'moderacion' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Moderación</button>
+      <button @click="currentTab = 'auditoria'" :class="['px-6 py-4 font-semibold whitespace-nowrap focus:outline-none', currentTab === 'auditoria' ? 'text-primary-blue border-b-2 border-primary-blue bg-blue-50/30' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50']">Auditoría</button>
     </div>
 
     <!-- TAB 1: USUARIOS -->
@@ -92,6 +92,65 @@
       </div>
     </div>
 
+    <!-- TAB 4: CATEGORIAS -->
+    <div v-if="currentTab === 'categorias'" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+        <h3 class="font-bold text-gray-900">Gestión de Categorías de Conocimiento</h3>
+      </div>
+      <div class="p-6">
+        <form @submit.prevent="createCategory" class="mb-8 flex flex-col md:flex-row gap-4 items-end bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div class="flex-1 w-full">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Categoría <span class="text-red-500">*</span></label>
+            <input v-model="formCategory.nombre" required type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-blue focus:border-primary-blue outline-none bg-white">
+          </div>
+          <div class="flex-1 w-full">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <input v-model="formCategory.descripcion" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-blue focus:border-primary-blue outline-none bg-white">
+          </div>
+          <div class="flex-1 w-full">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Área Técnica <span class="text-red-500">*</span></label>
+            <select v-model="formCategory.areaTecnica" required class="w-full border border-gray-300 rounded-md p-2 focus:ring-primary-blue focus:border-primary-blue outline-none bg-white">
+              <option value="">Seleccionar...</option>
+              <option v-for="area in areaTecnicaOptions" :key="area" :value="area">{{ area }}</option>
+            </select>
+          </div>
+          <div class="w-full md:w-auto mt-4 md:mt-0">
+            <button type="submit" class="w-full md:w-auto bg-primary-blue hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition">
+              Añadir 
+            </button>
+          </div>
+        </form>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-full">
+            <thead>
+              <tr class="bg-white border-b border-gray-200 text-xs uppercase text-gray-500 tracking-wider">
+                <th class="p-4 font-semibold">ID</th>
+                <th class="p-4 font-semibold">Nombre</th>
+                <th class="p-4 font-semibold hidden md:table-cell">Descripción</th>
+                <th class="p-4 font-semibold text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr v-for="cat in categoriasLocales" :key="cat.idCategoria" class="hover:bg-gray-50 transition">
+                <td class="p-4 text-sm text-gray-900 font-bold whitespace-nowrap">#{{ cat.idCategoria }}</td>
+                <td class="p-4 text-sm text-gray-900 font-medium">{{ cat.nombre }}</td>
+                <td class="p-4 text-sm text-gray-600 hidden md:table-cell truncate max-w-[200px]">{{ cat.descripcion }}</td>
+                <td class="p-4 text-right">
+                  <button @click="deleteCategory(cat.idCategoria)" class="text-red-500 hover:bg-red-50 p-2 rounded-md transition" title="Eliminar Categoría">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="categoriasLocales.length === 0">
+                <td colspan="4" class="p-8 text-center text-gray-500">No hay categorías. Crea la primera.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -104,6 +163,22 @@ const currentTab = ref('usuarios')
 const users = ref([])
 const reports = ref([])
 const audits = ref([])
+const categoriasLocales = ref([])
+
+const formCategory = ref({
+  nombre: '',
+  descripcion: '',
+  areaTecnica: ''
+})
+
+const areaTecnicaOptions = [
+  'Desarrollo',
+  'IA',
+  'Infraestructura',
+  'Bases_de_Datos',
+  'Redes',
+  'Otro'
+]
 
 const loadData = async () => {
   try {
@@ -116,6 +191,9 @@ const loadData = async () => {
     } else if (currentTab.value === 'auditoria') {
       const res = await api.get('/admin/audit')
       audits.value = res.data.items || res.data || []
+    } else if (currentTab.value === 'categorias') {
+      const res = await api.get('/admin/categories')
+      categoriasLocales.value = res.data.items || res.data || []
     }
   } catch (error) {
     console.error('Error cargando Tab Admin', error)
@@ -149,6 +227,32 @@ const deleteUser = async (idUsuario) => {
     loadData()
   } catch(e) {
     alert('Error borrando usuario')
+  }
+}
+
+const createCategory = async () => {
+  try {
+    const res = await api.post('/admin/categories', {
+      nombre: formCategory.value.nombre,
+      descripcion: formCategory.value.descripcion || '',
+      areaTecnica: formCategory.value.areaTecnica
+    })
+    categoriasLocales.value.push(res.data)
+    formCategory.value.nombre = ''
+    formCategory.value.descripcion = ''
+    formCategory.value.areaTecnica = ''
+  } catch (e) {
+    alert('Error al crear categoría')
+  }
+}
+
+const deleteCategory = async (id) => {
+  if(!confirm('¿Estás seguro de eliminar esta categoría y posiblemente los hilos asociados?')) return
+  try {
+    await api.delete(`/admin/categories/${id}`)
+    categoriasLocales.value = categoriasLocales.value.filter(c => c.idCategoria !== id)
+  } catch (e) {
+    alert('Error al eliminar categoría')
   }
 }
 </script>

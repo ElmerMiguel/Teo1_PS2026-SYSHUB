@@ -2,6 +2,9 @@
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
     <div class="h-32 relative" :class="colorBanner"></div>
     <div class="p-4 flex flex-col flex-grow">
+      <div v-if="project.curaduria?.activo" class="mb-2 inline-flex items-center text-[0.65rem] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full w-max">
+        Destacado
+      </div>
       <h6 class="font-bold text-gray-900 truncate mb-1" :title="project.titulo">{{ project.titulo }}</h6>
       <p class="text-xs text-gray-500 mb-3 line-clamp-2">{{ project.descripcion || 'Sin descripción' }}</p>
       
