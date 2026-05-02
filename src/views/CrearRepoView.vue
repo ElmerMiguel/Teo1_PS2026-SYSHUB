@@ -164,6 +164,17 @@ const handleFileUpload = (e) => {
 const submitProject = async () => {
   loading.value = true
   try {
+    if (form.value.titulo.trim().length < 3) {
+      alert('El título debe tener al menos 3 caracteres.')
+      loading.value = false
+      return
+    }
+
+    if (form.value.descripcion.trim().length < 10) {
+      alert('La descripción debe tener al menos 10 caracteres.')
+      loading.value = false
+      return
+    }
     const etiquetas = form.value.etiquetas
       ? form.value.etiquetas.split(',').map(t => t.trim()).filter(Boolean)
       : []
@@ -195,7 +206,8 @@ const submitProject = async () => {
       descripcion: form.value.descripcion,
       idCategoria: form.value.idCategoria ? parseInt(form.value.idCategoria) : undefined,
       stackTecnologico: { lenguajes },
-      etiquetas
+      etiquetas,
+      estado: 'borrador'
     })
     
     const projId = res.data.idProyecto || res.data.id;
@@ -213,7 +225,9 @@ const submitProject = async () => {
     router.push('/dashboard')
   } catch (e) {
     console.error(e)
-    alert('Ocurrió un error al crear el proyecto.')
+    const message = e.response?.data?.message
+    const details = Array.isArray(message) ? message.join('\n') : message
+    alert(details || 'Ocurrió un error al crear el proyecto.')
   } finally {
     loading.value = false
   }

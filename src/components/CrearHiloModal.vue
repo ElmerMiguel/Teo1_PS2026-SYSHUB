@@ -79,6 +79,18 @@ const close = () => {
 const submitThread = async () => {
   loading.value = true
   try {
+    if (form.value.titulo.trim().length < 5) {
+      alert('El título debe tener al menos 5 caracteres.')
+      loading.value = false
+      return
+    }
+
+    if (form.value.contenido.trim().length < 10) {
+      alert('El contenido debe tener al menos 10 caracteres.')
+      loading.value = false
+      return
+    }
+
     await api.post('/social/threads', {
       titulo: form.value.titulo,
       contenido: form.value.contenido,
@@ -94,7 +106,9 @@ const submitThread = async () => {
     close()
   } catch (error) {
     console.error(error)
-    alert('Error al publicar el hilo. Verifica los campos.')
+    const message = error.response?.data?.message
+    const details = Array.isArray(message) ? message.join('\n') : message
+    alert(details || 'Error al publicar el hilo. Verifica los campos.')
   } finally {
     loading.value = false
   }
