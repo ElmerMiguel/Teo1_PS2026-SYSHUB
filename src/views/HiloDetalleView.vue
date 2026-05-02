@@ -18,10 +18,10 @@
       
       <div class="flex items-center gap-3 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-100">
         <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-700 text-xs shadow-sm">
-          {{ `U${thread.idUsuario}`.substring(0,2).toUpperCase() }}
+          {{ threadInitials }}
         </div>
         <div>
-          <span class="font-medium text-gray-900">{{ `Usuario #${thread.idUsuario}` }}</span>
+          <span class="font-medium text-gray-900">{{ threadAuthor }}</span>
           <span class="mx-2">·</span>
           <span>{{ new Date(thread.fechaCreacion).toLocaleDateString() }}</span>
         </div>
@@ -38,7 +38,7 @@
         <button @click="voteThread('downvote')" class="flex items-center gap-1 hover:text-red-500 transition">
           <i class="bi bi-hand-thumbs-down"></i> <span class="text-sm font-medium">Downvote</span>
         </button>
-        <span class="text-sm font-semibold">Score: {{ threadScore }}</span>
+  <span class="text-sm font-semibold">Score: {{ threadScore }}</span>
         <button @click="saveThread" class="flex items-center gap-1 hover:text-primary-blue transition">
           <i class="bi bi-bookmark"></i> <span class="text-sm font-medium">Guardar</span>
         </button>
@@ -109,6 +109,26 @@ const loading = ref(true)
 const orderByScore = ref(false)
 const threadScore = ref(0)
 
+const threadAuthor = computed(() => {
+  if (!thread.value) return ''
+  const user = thread.value.usuario
+  if (user?.nombre) {
+    return `${user.nombre} ${user.apellido || ''}`.trim()
+  }
+  return `Usuario #${thread.value.idUsuario}`
+})
+
+const threadInitials = computed(() => {
+  if (!thread.value) return 'U'
+  const user = thread.value.usuario
+  if (user?.nombre) {
+    return `${user.nombre.charAt(0)}${(user.apellido || '').charAt(0)}`
+      .toUpperCase()
+      .trim() || user.nombre.charAt(0).toUpperCase()
+  }
+  return `U${thread.value.idUsuario}`.substring(0, 2).toUpperCase()
+})
+
 const totalComments = computed(() => comments.value.length)
 
 const commentTree = computed(() => buildCommentTree(comments.value))
@@ -119,6 +139,7 @@ const fetchThreadData = async () => {
     const threadId = route.params.id
     const tRes = await api.get(`/social/threads/${threadId}`)
     thread.value = tRes.data
+  threadScore.value = tRes.data?.score ?? 0
     await fetchComments()
   } catch (error) {
     console.error('Error cargando hilo:', error)

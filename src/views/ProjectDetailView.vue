@@ -122,7 +122,10 @@ const fetchProject = async () => {
 const registerView = async () => {
   if (!project.value || project.value.estado !== 'publicado') return
   try {
-    await api.post(`/projects/${project.value.idProyecto}/views`)
+    const res = await api.post(`/projects/${project.value.idProyecto}/views`)
+    if (res.data?.vistas !== undefined) {
+      project.value.vistas = res.data.vistas
+    }
   } catch (error) {
     // Ignorar si ya se registró la vista
   }

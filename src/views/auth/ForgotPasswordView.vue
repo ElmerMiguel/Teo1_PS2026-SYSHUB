@@ -13,8 +13,12 @@
         <span v-else>Enviar enlace</span>
       </button>
     </form>
-    <div v-if="message" class="mt-4 text-center text-sm text-blue-700 bg-blue-50 border border-blue-100 rounded-md p-3">
-      {{ message }}
+    <div v-if="message" class="mt-4 text-center text-sm text-blue-700 bg-blue-50 border border-blue-100 rounded-md p-3 space-y-2">
+      <div>{{ message }}</div>
+      <div v-if="resetUrl" class="text-xs text-blue-800 break-words">
+        <span class="font-semibold">Enlace:</span>
+        <a :href="resetUrl" class="underline" target="_blank" rel="noopener">{{ resetUrl }}</a>
+      </div>
     </div>
     <div class="mt-6 text-center">
       <router-link to="/auth/login" class="text-sm font-medium text-primary-blue hover:text-blue-500">
@@ -31,14 +35,17 @@ import api from '../../services/api'
 const email = ref('')
 const isLoading = ref(false)
 const message = ref('')
+const resetUrl = ref('')
 
 const handleRequest = async () => {
   isLoading.value = true
   try {
     const res = await api.post('/auth/password/reset/request', { email: email.value })
     message.value = res.data?.message || 'Si el correo existe, recibirás instrucciones.'
+    resetUrl.value = res.data?.resetUrl || ''
   } catch (error) {
     message.value = error.response?.data?.message || 'No se pudo procesar la solicitud.'
+    resetUrl.value = ''
   } finally {
     isLoading.value = false
   }

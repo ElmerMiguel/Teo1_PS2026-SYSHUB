@@ -63,8 +63,22 @@ const emit = defineEmits(['reply', 'vote', 'report', 'delete'])
 const showReply = ref(false)
 const replyText = ref('')
 
-const authorName = computed(() => `Usuario #${props.comment.idUsuario}`)
-const userInitials = computed(() => authorName.value.replace('Usuario #', 'U').substring(0, 2))
+const authorName = computed(() => {
+  const user = props.comment.usuario
+  if (user?.nombre) {
+    return `${user.nombre} ${user.apellido || ''}`.trim()
+  }
+  return `Usuario #${props.comment.idUsuario}`
+})
+const userInitials = computed(() => {
+  const user = props.comment.usuario
+  if (user?.nombre) {
+    return `${user.nombre.charAt(0)}${(user.apellido || '').charAt(0)}`
+      .toUpperCase()
+      .trim() || user.nombre.charAt(0).toUpperCase()
+  }
+  return authorName.value.replace('Usuario #', 'U').substring(0, 2)
+})
 const createdAt = computed(() => new Date(props.comment.fechaCreacion).toLocaleDateString())
 
 const toggleReply = () => {

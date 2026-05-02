@@ -12,7 +12,7 @@
         <span>·</span>
         <span>{{ new Date(article.fechaPublicacion).toLocaleDateString() }}</span>
         <span>·</span>
-        <span>Autor #{{ article.idAutor }}</span>
+        <span>{{ articleAuthor }}</span>
       </div>
 
       <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ article.titulo }}</h1>
@@ -46,7 +46,9 @@
       <div class="space-y-4">
         <div v-for="comment in comments" :key="comment.idComentario" class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <div class="flex items-center justify-between mb-2">
-            <div class="text-sm font-semibold text-gray-800">Usuario #{{ comment.idUsuario }}</div>
+            <div class="text-sm font-semibold text-gray-800">
+              {{ commentAuthor(comment) }}
+            </div>
             <div class="text-xs text-gray-500">{{ new Date(comment.fechaCreacion).toLocaleDateString() }}</div>
           </div>
           <div class="text-gray-700 whitespace-pre-wrap">{{ comment.contenido }}</div>
@@ -67,7 +69,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../services/api'
 
@@ -78,11 +80,21 @@ const newComment = ref('')
 const loading = ref(false)
 const articleScore = ref(0)
 
+const articleAuthor = computed(() => {
+  if (!article.value) return ''
+  const author = article.value.autor
+  if (author?.nombre) {
+    return `${author.nombre} ${author.apellido || ''}`.trim()
+  }
+  return `Autor #${article.value.idAutor}`
+})
+
 const fetchArticle = async () => {
   loading.value = true
   try {
     const res = await api.get(`/social/articles/${route.params.id}`)
     article.value = res.data
+  articleScore.value = res.data?.score ?? 0
     await fetchComments()
   } catch (error) {
     console.error('Error cargando artículo', error)
@@ -134,6 +146,14 @@ const voteComment = async (idComentario, tipo) => {
   } catch (error) {
     alert('No se pudo registrar el voto del comentario.')
   }
+}
+
+const commentAuthor = (comment) => {
+  const user = comment.usuario
+  if (user?.nombre) {
+    return `${user.nombre} ${user.apellido || ''}`.trim()
+  }
+  return `Usuario #${comment.idUsuario}`
 }
 
 const reportComment = async (idComentario) => {

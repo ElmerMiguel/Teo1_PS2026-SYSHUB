@@ -13,9 +13,8 @@
 
 
     <!-- Blog Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-      
-      <div v-for="a in articles" :key="a.idArticulo" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div v-for="a in articles" :key="a.idArticulo" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition cursor-pointer" @click="openArticle(a)">
         <div class="h-48 bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center text-4xl text-blue-500 font-bold">
           <i class="bi bi-file-earmark-text"></i>
         </div>
@@ -29,9 +28,11 @@
           <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
             <div class="flex items-center gap-2">
               <div class="w-6 h-6 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold text-[10px]">
-                {{ a.usuario?.nombre?.charAt(0) || 'U' }}
+                {{ a.autor?.nombre?.charAt(0) || 'U' }}
               </div>
-              <span class="text-sm text-gray-900 font-medium">{{ a.usuario?.nombre || 'Usuario' }}</span>
+              <span class="text-sm text-gray-900 font-medium">
+                {{ a.autor?.nombre ? `${a.autor.nombre} ${a.autor.apellido || ''}`.trim() : 'Usuario' }}
+              </span>
             </div>
           </div>
         </div>
@@ -55,6 +56,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import CrearArticuloModal from '../components/CrearArticuloModal.vue'
@@ -62,6 +64,7 @@ import CrearArticuloModal from '../components/CrearArticuloModal.vue'
 const articles = ref([])
 const authStore = useAuthStore()
 const isModalOpen = ref(false)
+const router = useRouter()
 
 const fetchArticles = async () => {
   try {
@@ -82,5 +85,9 @@ const createArticle = () => {
     return
   }
   isModalOpen.value = true
+}
+
+const openArticle = (article) => {
+  router.push(`/blogs/${article.idArticulo}`)
 }
 </script>

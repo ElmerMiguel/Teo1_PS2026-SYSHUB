@@ -50,8 +50,22 @@ const categoryBadgeClass = computed(() => {
   return 'bg-gray-100 text-gray-700'
 })
 
-const authorName = computed(() => `Usuario #${props.thread.idUsuario || 'N/A'}`)
-const userInitials = computed(() => authorName.value.replace('Usuario #', 'U').substring(0,2).toUpperCase())
+const authorName = computed(() => {
+  const user = props.thread.usuario
+  if (user?.nombre) {
+    return `${user.nombre} ${user.apellido || ''}`.trim()
+  }
+  return `Usuario #${props.thread.idUsuario || 'N/A'}`
+})
+const userInitials = computed(() => {
+  const user = props.thread.usuario
+  if (user?.nombre) {
+    return `${user.nombre.charAt(0)}${(user.apellido || '').charAt(0)}`
+      .toUpperCase()
+      .trim() || user.nombre.charAt(0).toUpperCase()
+  }
+  return authorName.value.replace('Usuario #', 'U').substring(0,2).toUpperCase()
+})
 const timeAgo = computed(() => props.thread.fechaCreacion ? new Date(props.thread.fechaCreacion).toLocaleDateString() : 'reciente')
 
 const avatarColor = computed(() => {
