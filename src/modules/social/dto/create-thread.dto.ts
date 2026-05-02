@@ -6,7 +6,7 @@ export class CreateThreadDto {
   titulo!: string;
 
   @IsString()
-  @Length(10, 5000)
+  @Length(10, 20000)
   contenido!: string;
 
   @IsOptional()
