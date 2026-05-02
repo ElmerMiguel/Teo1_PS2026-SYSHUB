@@ -40,23 +40,61 @@ VALUES
   ('Compiladores', '#e67e22');
 
 -- 5. Crear Categorías (Pensum / Áreas Técnicas)
-INSERT INTO CATEGORIA (nombre, descripcion, area_tecnica)
+-- Metodología de Sistemas
+INSERT INTO CATEGORIA (nombre, area_tecnica)
 VALUES
-  ('Programación 1', 'Introducción a la programación orientada a objetos', 'Desarrollo'),
-  ('Bases de Datos 1', 'Modelo relacional y SQL', 'Bases_de_Datos'),
-  ('Inteligencia Artificial 1', 'Fundamentos de IA y Machine Learning', 'IA'),
-  ('Redes de Computadoras 1', 'Capa física, enlace y red', 'Redes');
+  ('Lógica de Sistemas', 'Metodologia_Sistemas'),
+  ('Economía', 'Metodologia_Sistemas'),
+  ('Teoría de Sistemas 1', 'Metodologia_Sistemas'),
+  ('Teoría de Sistemas 2', 'Metodologia_Sistemas'),
+  ('Seminario de Sistemas I', 'Metodologia_Sistemas'),
+  ('Modelación y Simulación 1', 'Metodologia_Sistemas'),
+  ('Sistemas Organizacionales y Gerenciales 1', 'Metodologia_Sistemas'),
+  ('Seminario de Sistemas 2', 'Metodologia_Sistemas'),
+  ('Modelación y Simulación 2', 'Metodologia_Sistemas'),
+  ('Sistemas Organizacionales y Gerenciales 2', 'Metodologia_Sistemas'),
+  ('Seminario de Investigación', 'Metodologia_Sistemas'),
+  ('Auditoría de Proyectos de Software', 'Metodologia_Sistemas'),
+  ('Emprendedores de Negocios Informáticos', 'Metodologia_Sistemas'),
+  ('Redes de Nueva Generación', 'Metodologia_Sistemas');
 
--- Subcategorías (Ejemplo)
-INSERT INTO CATEGORIA (nombre, descripcion, area_tecnica, id_categoria_padre)
+-- Desarrollo de Software
+INSERT INTO CATEGORIA (nombre, area_tecnica)
 VALUES
-  ('Proyecto Final - DB1', 'Proyectos desarrollados al final del curso', 'Bases_de_Datos', (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Bases de Datos 1')),
-  ('Práctica 1 - Compiladores', 'Análisis Léxico', 'Desarrollo', NULL);
+  ('Introducción a la Programación y Computación 1', 'Desarrollo_Software'),
+  ('Introducción a la Programación y Computación 2', 'Desarrollo_Software'),
+  ('Estructuras de Datos', 'Desarrollo_Software'),
+  ('Manejo e Implementación de Archivos', 'Desarrollo_Software'),
+  ('Sistemas de Bases de Datos 1', 'Desarrollo_Software'),
+  ('Análisis y Diseño de Sistemas 1', 'Desarrollo_Software'),
+  ('Sistemas de Bases de Datos 2', 'Desarrollo_Software'),
+  ('Análisis y Diseño de Sistemas 2', 'Desarrollo_Software'),
+  ('Bases de Datos Avanzadas', 'Desarrollo_Software'),
+  ('Sistemas Aplicados 1', 'Desarrollo_Software'),
+  ('Software Avanzado', 'Desarrollo_Software'),
+  ('Sistemas Aplicados 2', 'Desarrollo_Software');
+
+-- Ciencias de la Computación
+INSERT INTO CATEGORIA (nombre, area_tecnica)
+VALUES
+  ('Lenguajes Formales y de Programación', 'Ciencias_Computacion'),
+  ('Organización de Lenguajes y Compiladores 1', 'Ciencias_Computacion'),
+  ('Organización Computacional', 'Ciencias_Computacion'),
+  ('Arquitectura de Computadores y Ensambladores 1', 'Ciencias_Computacion'),
+  ('Organización de Lenguajes y Compiladores 2', 'Ciencias_Computacion'),
+  ('Sistemas Operativos 1', 'Ciencias_Computacion'),
+  ('Arquitectura de Computadores y Ensambladores 2', 'Ciencias_Computacion'),
+  ('Redes de Computadoras 1', 'Ciencias_Computacion'),
+  ('Sistemas Operativos 2', 'Ciencias_Computacion'),
+  ('Redes de Computadoras 2', 'Ciencias_Computacion'),
+  ('Inteligencia Artificial 1', 'Ciencias_Computacion'),
+  ('Seguridad y Auditoría de Redes de Computadoras', 'Ciencias_Computacion'),
+  ('Inteligencia Artificial 2', 'Ciencias_Computacion');
 
 -- 6. Crear Proyectos
 INSERT INTO PROYECTO (titulo, descripcion, stack_tecnologico, estado, id_usuario, id_categoria, vistas)
 VALUES
-  ('Sistema de Gestión de Inventario', 'Un proyecto para gestionar inventarios utilizando Java y PostgreSQL.', '{"lenguajes": ["Java", "SQL"], "frameworks": ["Spring Boot"]}', 'publicado', (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante2@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Bases de Datos 1'), 15),
+  ('Sistema de Gestión de Inventario', 'Un proyecto para gestionar inventarios utilizando Java y PostgreSQL.', '{"lenguajes": ["Java", "SQL"], "frameworks": ["Spring Boot"]}', 'publicado', (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante2@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Sistemas de Bases de Datos 1'), 15),
   ('Chatbot de Asistencia', 'Implementación de un chatbot con NLP básico usando Python.', '{"lenguajes": ["Python"], "librerias": ["NLTK", "TensorFlow"]}', 'publicado', (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Inteligencia Artificial 1'), 42),
   ('Borrador - Simulador de Redes', 'Proyecto en desarrollo sobre simulación de enrutamiento OSI.', '{"lenguajes": ["C++"]}', 'borrador', (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante2@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Redes de Computadoras 1'), 0);
 
@@ -76,8 +114,8 @@ VALUES
 -- 9. Crear Hilos en Foro (Sys-Reddit)
 INSERT INTO HILO_FORO (titulo, contenido, id_usuario, id_categoria, estado, vistas, fijado)
 VALUES
-  ('Duda conceptual: Diferencia entre INNER JOIN y LEFT JOIN', 'Alguien me puede explicar de forma sencilla la diferencia con ejemplos prácticos? Me confundo en las consultas complejas.', (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Bases de Datos 1'), 'abierto', 20, FALSE),
-  ('Recursos recomendados para aprender React', 'He recopilado algunos enlaces buenos para empezar con React. Dejen los suyos en los comentarios.', (SELECT id_usuario FROM USUARIO WHERE email = 'auxiliar1@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Programación 1'), 'abierto', 55, TRUE);
+  ('Duda conceptual: Diferencia entre INNER JOIN y LEFT JOIN', 'Alguien me puede explicar de forma sencilla la diferencia con ejemplos prácticos? Me confundo en las consultas complejas.', (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Sistemas de Bases de Datos 1'), 'abierto', 20, FALSE),
+  ('Recursos recomendados para aprender React', 'He recopilado algunos enlaces buenos para empezar con React. Dejen los suyos en los comentarios.', (SELECT id_usuario FROM USUARIO WHERE email = 'auxiliar1@syshub.com'), (SELECT id_categoria FROM CATEGORIA WHERE nombre = 'Introducción a la Programación y Computación 1'), 'abierto', 55, TRUE);
 
 -- 10. Crear Artículos (Blogs de formato largo)
 INSERT INTO ARTICULO (titulo, contenido_html, resumen, id_autor, estado)
@@ -112,7 +150,7 @@ VALUES
 -- 15. Crear Auditorías de Admin
 INSERT INTO ADMIN_AUDIT (accion, entidad, entidad_id, detalles, id_admin)
 VALUES
-  ('CREATE_CATEGORY', 'categoria', 1, '{"nombre": "Programación 1"}', (SELECT id_usuario FROM USUARIO WHERE email = 'admin@syshub.com')),
+  ('CREATE_CATEGORY', 'categoria', 1, '{"nombre": "Introducción a la Programación y Computación 1"}', (SELECT id_usuario FROM USUARIO WHERE email = 'admin@syshub.com')),
   ('CREATE_SYS_USER', 'usuario', 2, '{"rol": "ESTUDIANTE"}', (SELECT id_usuario FROM USUARIO WHERE email = 'admin@syshub.com'));
 
 -- 16. Reportes

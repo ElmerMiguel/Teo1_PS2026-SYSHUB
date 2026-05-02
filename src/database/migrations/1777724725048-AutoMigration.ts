@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AutoMigration1777714381068 implements MigrationInterface {
-    name = 'AutoMigration1777714381068'
+export class AutoMigration1777724725048 implements MigrationInterface {
+    name = 'AutoMigration1777724725048'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "rol" ("id_rol" SERIAL NOT NULL, "nombre_rol" character varying(50) NOT NULL, "descripcion" character varying(255), CONSTRAINT "UQ_25cd1dbb608db5a46969d902f53" UNIQUE ("nombre_rol"), CONSTRAINT "PK_0b42a30072d57ccfad9949218da" PRIMARY KEY ("id_rol"))`);
@@ -14,7 +14,7 @@ export class AutoMigration1777714381068 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "etiqueta" ("id_etiqueta" SERIAL NOT NULL, "nombre" character varying(100) NOT NULL, "color" character varying(7) NOT NULL DEFAULT '#3498db', CONSTRAINT "UQ_c24e444690deb02aa6202719e56" UNIQUE ("nombre"), CONSTRAINT "PK_9fe868fc5036d07f153b9c997d6" PRIMARY KEY ("id_etiqueta"))`);
         await queryRunner.query(`CREATE TYPE "public"."proyecto_estado_enum" AS ENUM('borrador', 'pendiente', 'publicado', 'archivado')`);
         await queryRunner.query(`CREATE TABLE "proyecto" ("id_proyecto" SERIAL NOT NULL, "titulo" character varying(200) NOT NULL, "descripcion" text, "stack_tecnologico" jsonb, "fecha_publicacion" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "estado" "public"."proyecto_estado_enum" NOT NULL DEFAULT 'borrador', "id_usuario" integer NOT NULL, "id_categoria" integer, "vistas" integer NOT NULL DEFAULT '0', CONSTRAINT "PK_5ecc7af27ab7fa5ed5243d437c4" PRIMARY KEY ("id_proyecto"))`);
-        await queryRunner.query(`CREATE TYPE "public"."categoria_area_tecnica_enum" AS ENUM('Desarrollo', 'IA', 'Infraestructura', 'Bases_de_Datos', 'Redes', 'Otro')`);
+        await queryRunner.query(`CREATE TYPE "public"."categoria_area_tecnica_enum" AS ENUM('Metodologia_Sistemas', 'Desarrollo_Software', 'Ciencias_Computacion', 'Otro')`);
         await queryRunner.query(`CREATE TABLE "categoria" ("id_categoria" SERIAL NOT NULL, "nombre" character varying(150) NOT NULL, "descripcion" text, "area_tecnica" "public"."categoria_area_tecnica_enum" NOT NULL, "id_categoria_padre" integer, CONSTRAINT "PK_950063d23664f5aaec4dcada4d4" PRIMARY KEY ("id_categoria"))`);
         await queryRunner.query(`CREATE TYPE "public"."reporte_estado_enum" AS ENUM('pendiente', 'resuelto', 'desestimado')`);
         await queryRunner.query(`CREATE TABLE "reporte" ("id_reporte" SERIAL NOT NULL, "razon" character varying(255) NOT NULL, "descripcion" text, "fecha_reporte" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "estado" "public"."reporte_estado_enum" NOT NULL DEFAULT 'pendiente', "id_reportador" integer NOT NULL, "id_hilo" integer, "id_comentario" integer, "id_proyecto" integer, "id_moderador" integer, CONSTRAINT "PK_47bdb6e5b218eb2f5e205dfbbb9" PRIMARY KEY ("id_reporte"))`);

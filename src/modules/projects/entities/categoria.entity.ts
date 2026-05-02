@@ -9,11 +9,9 @@ import {
 import { ProyectoEntity } from './proyecto.entity';
 
 export enum AreaTecnicaCategoria {
-  DESARROLLO = 'Desarrollo',
-  IA = 'IA',
-  INFRAESTRUCTURA = 'Infraestructura',
-  BASES_DE_DATOS = 'Bases_de_Datos',
-  REDES = 'Redes',
+  METODOLOGIA = 'Metodologia_Sistemas',
+  DESARROLLO = 'Desarrollo_Software',
+  CIENCIAS_COMPUTACION = 'Ciencias_Computacion',
   OTRO = 'Otro',
 }
 

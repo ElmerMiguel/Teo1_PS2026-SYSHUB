@@ -11,7 +11,7 @@ CREATE TYPE estado_hilo AS ENUM ('abierto', 'cerrado', 'archivado');
 CREATE TYPE estado_articulo AS ENUM ('borrador', 'publicado', 'archivado');
 CREATE TYPE estado_reporte AS ENUM ('pendiente', 'resuelto', 'desestimado');
 CREATE TYPE tipo_valoracion AS ENUM ('upvote', 'downvote');
-CREATE TYPE area_tecnica_cat AS ENUM ('Desarrollo', 'IA', 'Infraestructura', 'Bases_de_Datos', 'Redes', 'Otro');
+CREATE TYPE area_tecnica_cat AS ENUM ('Metodologia_Sistemas', 'Desarrollo_Software', 'Ciencias_Computacion', 'Otro');
 CREATE TYPE tipo_contenido_guardado AS ENUM ('proyecto', 'articulo', 'hilo');
 
 -- 2. TABLAS MAESTRAS (Sin dependencias)

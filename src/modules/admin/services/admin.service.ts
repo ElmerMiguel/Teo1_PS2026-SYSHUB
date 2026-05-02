@@ -687,11 +687,9 @@ export class AdminService {
   }
 
   readonly availableAreas: AreaTecnicaCategoria[] = [
+    AreaTecnicaCategoria.METODOLOGIA,
     AreaTecnicaCategoria.DESARROLLO,
-    AreaTecnicaCategoria.IA,
-    AreaTecnicaCategoria.INFRAESTRUCTURA,
-    AreaTecnicaCategoria.BASES_DE_DATOS,
-    AreaTecnicaCategoria.REDES,
+    AreaTecnicaCategoria.CIENCIAS_COMPUTACION,
     AreaTecnicaCategoria.OTRO,
   ];
 }
