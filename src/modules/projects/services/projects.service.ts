@@ -125,7 +125,9 @@ export class ProjectsService {
       throw new NotFoundException('Archivo no pertenece al proyecto');
     }
 
-    const isAdmin = user.roles.some((r) => r.toUpperCase() === 'ADMIN');
+    const isAdmin = user.roles.some(
+      (r) => r.toUpperCase() === 'ADMIN' || r.toUpperCase() === 'ADMINISTRADOR',
+    );
     const isOwner = user.sub === file.proyecto.idUsuario;
     const isPublished = file.proyecto.estado === EstadoProyecto.PUBLICADO;
 
@@ -154,7 +156,7 @@ export class ProjectsService {
       .leftJoinAndSelect('p.categoria', 'cat')
       .leftJoinAndSelect('p.etiquetas', 'e')
       .where('c.activo = true')
-      .orderBy('c.fecha_destacado', 'DESC')
+      .orderBy('c.fechaDestacado', 'DESC')
       .getMany();
   }
 
@@ -400,7 +402,11 @@ export class ProjectsService {
   }
 
   private ensureOwner(user: JwtPayload, ownerId: number) {
-    const isAdmin = user.roles.some((role) => role.toUpperCase() === 'ADMIN');
+    const isAdmin = user.roles.some(
+      (role) =>
+        role.toUpperCase() === 'ADMIN' ||
+        role.toUpperCase() === 'ADMINISTRADOR',
+    );
     if (isAdmin) return;
 
     if (user.sub !== ownerId) {
@@ -412,7 +418,11 @@ export class ProjectsService {
 
   private hasCurationRole(roles: string[]): boolean {
     const normalized = roles.map((role) => role.toUpperCase());
-    return normalized.includes('AUXILIAR') || normalized.includes('ADMIN');
+    return (
+      normalized.includes('AUXILIAR') ||
+      normalized.includes('ADMIN') ||
+      normalized.includes('ADMINISTRADOR')
+    );
   }
 
   private async validateProjectCanBePublished(

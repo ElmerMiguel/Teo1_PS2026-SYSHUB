@@ -76,7 +76,7 @@ export class AdminService {
     const qb = this.userRepository
       .createQueryBuilder('u')
       .leftJoinAndSelect('u.roles', 'rol')
-      .orderBy('u.fecha_registro', 'DESC')
+      .orderBy('u.fechaRegistro', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -178,7 +178,7 @@ export class AdminService {
     const qb = this.auditRepository
       .createQueryBuilder('a')
       .leftJoinAndSelect('a.admin', 'admin')
-      .orderBy('a.fecha_accion', 'DESC')
+      .orderBy('a.fechaAccion', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -366,7 +366,7 @@ export class AdminService {
       .leftJoinAndSelect('r.proyecto', 'proyecto')
       .leftJoinAndSelect('r.reportador', 'reportador')
       .leftJoinAndSelect('r.moderador', 'moderador')
-      .orderBy('r.fecha_reporte', 'DESC')
+      .orderBy('r.fechaReporte', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -567,16 +567,25 @@ export class AdminService {
 
   private ensureAdminRole(roles: string[]): void {
     const normalized = roles.map((item) => item.toUpperCase());
-    if (!normalized.includes('ADMIN')) {
-      throw new ForbiddenException('Solo ADMIN puede realizar esta acción');
+    if (
+      !normalized.includes('ADMIN') &&
+      !normalized.includes('ADMINISTRADOR')
+    ) {
+      throw new ForbiddenException(
+        'Solo ADMIN o ADMINISTRADOR puede realizar esta acción',
+      );
     }
   }
 
   private ensureAdminOrModeratorRole(roles: string[]): void {
     const normalized = roles.map((item) => item.toUpperCase());
-    if (!normalized.includes('ADMIN') && !normalized.includes('MODERADOR')) {
+    if (
+      !normalized.includes('ADMIN') &&
+      !normalized.includes('ADMINISTRADOR') &&
+      !normalized.includes('MODERADOR')
+    ) {
       throw new ForbiddenException(
-        'Solo ADMIN o MODERADOR puede realizar esta acción',
+        'Solo ADMIN, ADMINISTRADOR o MODERADOR puede realizar esta acción',
       );
     }
   }

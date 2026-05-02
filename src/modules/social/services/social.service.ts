@@ -456,12 +456,20 @@ export class SocialService {
 
   private hasArticleAuthorRole(roles: string[]): boolean {
     const normalized = roles.map((role) => role.toUpperCase());
-    return normalized.includes('AUXILIAR') || normalized.includes('ADMIN');
+    return (
+      normalized.includes('AUXILIAR') ||
+      normalized.includes('ADMIN') ||
+      normalized.includes('ADMINISTRADOR')
+    );
   }
 
   private ensureModeratorRole(roles: string[]): void {
     const normalized = roles.map((role) => role.toUpperCase());
-    if (!normalized.includes('ADMIN') && !normalized.includes('MODERADOR')) {
+    if (
+      !normalized.includes('ADMIN') &&
+      !normalized.includes('ADMINISTRADOR') &&
+      !normalized.includes('MODERADOR')
+    ) {
       throw new ForbiddenException(
         'Solo MODERADOR o ADMIN pueden moderar reportes',
       );
