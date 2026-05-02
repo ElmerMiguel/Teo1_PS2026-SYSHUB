@@ -6,6 +6,7 @@ import {
   ReportResponseDto,
   SocialCategoryResponseDto,
   ThreadResponseDto,
+  UserSummaryDto,
   VoteResponseDto,
 } from '../dto/social-response.dto';
 import { ArticuloEntity } from '../entities/articulo.entity';
@@ -14,6 +15,21 @@ import { HiloForoEntity } from '../entities/hilo-foro.entity';
 import { ReporteEntity } from '../entities/reporte.entity';
 
 export class SocialSerializer {
+  static toUserSummaryDto(user?: {
+    idUsuario: number;
+    nombre: string;
+    apellido: string;
+    fotoPerfil?: string | null;
+  }): UserSummaryDto | undefined {
+    if (!user) return undefined;
+    return {
+      idUsuario: user.idUsuario,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      fotoPerfil: user.fotoPerfil ?? undefined,
+    };
+  }
+
   static toCategoryDto(category: CategoriaEntity): SocialCategoryResponseDto {
     return {
       idCategoria: category.idCategoria,
@@ -22,7 +38,10 @@ export class SocialSerializer {
     };
   }
 
-  static toThreadDto(thread: HiloForoEntity): ThreadResponseDto {
+  static toThreadDto(
+    thread: HiloForoEntity,
+    score?: number,
+  ): ThreadResponseDto {
     return {
       idHilo: thread.idHilo,
       titulo: thread.titulo,
@@ -36,10 +55,15 @@ export class SocialSerializer {
       categoria: thread.categoria
         ? SocialSerializer.toCategoryDto(thread.categoria)
         : undefined,
+      usuario: SocialSerializer.toUserSummaryDto(thread.usuario),
+      score,
     };
   }
 
-  static toArticleDto(article: ArticuloEntity): ArticleResponseDto {
+  static toArticleDto(
+    article: ArticuloEntity,
+    score?: number,
+  ): ArticleResponseDto {
     return {
       idArticulo: article.idArticulo,
       titulo: article.titulo,
@@ -49,6 +73,8 @@ export class SocialSerializer {
       idAutor: article.idAutor,
       estado: article.estado,
       imagenPortada: article.imagenPortada,
+      autor: SocialSerializer.toUserSummaryDto(article.autor),
+      score,
     };
   }
 
@@ -66,6 +92,7 @@ export class SocialSerializer {
       idComentarioPadre: comment.idComentarioPadre,
       eliminado: comment.eliminado,
       score,
+      usuario: SocialSerializer.toUserSummaryDto(comment.usuario),
     };
   }
 

@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { JwtPayload } from '../../identity/auth/jwt-payload.interface';
 import { UsuarioEntity } from '../../identity/entities/usuario.entity';
 import { CategoriaEntity } from '../../projects/entities/categoria.entity';
@@ -73,6 +73,7 @@ export class SocialService {
 
     const qb = this.threadRepository
       .createQueryBuilder('h')
+      .leftJoinAndSelect('h.usuario', 'u')
       .leftJoinAndSelect('h.categoria', 'cat')
       .orderBy('h.fijado', 'DESC')
       .addOrderBy('h.fechaCreacion', 'DESC')
@@ -92,13 +93,17 @@ export class SocialService {
     }
 
     const [items, total] = await qb.getManyAndCount();
-    return { items, total, page, limit };
+    const scoresById = await this.getScoresByField(
+      'idHilo',
+      items.map((item) => item.idHilo),
+    );
+    return { items, total, page, limit, scoresById };
   }
 
   async getThreadById(idHilo: number) {
     const thread = await this.threadRepository.findOne({
       where: { idHilo },
-      relations: { categoria: true },
+      relations: { categoria: true, usuario: true },
     });
 
     if (!thread) {
@@ -106,6 +111,15 @@ export class SocialService {
     }
 
     return thread;
+  }
+
+  async getThreadWithScore(idHilo: number) {
+    const thread = await this.getThreadById(idHilo);
+    const score = (await this.getScoresByField('idHilo', [idHilo])).get(
+      idHilo,
+    );
+
+    return { thread, score: score ?? 0 };
   }
 
   async createArticle(user: JwtPayload, dto: CreateArticleDto) {
@@ -135,6 +149,7 @@ export class SocialService {
 
     const qb = this.articleRepository
       .createQueryBuilder('a')
+      .leftJoinAndSelect('a.autor', 'autor')
       .orderBy('a.fechaPublicacion', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
@@ -146,12 +161,17 @@ export class SocialService {
     }
 
     const [items, total] = await qb.getManyAndCount();
-    return { items, total, page, limit };
+    const scoresById = await this.getScoresByField(
+      'idArticulo',
+      items.map((item) => item.idArticulo),
+    );
+    return { items, total, page, limit, scoresById };
   }
 
   async getArticleById(idArticulo: number) {
     const article = await this.articleRepository.findOne({
       where: { idArticulo },
+      relations: { autor: true },
     });
 
     if (!article) {
@@ -159,6 +179,15 @@ export class SocialService {
     }
 
     return article;
+  }
+
+  async getArticleWithScore(idArticulo: number) {
+    const article = await this.getArticleById(idArticulo);
+    const score = (await this.getScoresByField('idArticulo', [idArticulo])).get(
+      idArticulo,
+    );
+
+    return { article, score: score ?? 0 };
   }
 
   async createThreadComment(
@@ -206,39 +235,48 @@ export class SocialService {
   async listThreadComments(idHilo: number) {
     await this.getThreadById(idHilo);
 
-    return this.commentRepository.find({
-      where: { idHilo },
+    const comments = await this.commentRepository.find({
+      where: { idHilo, eliminado: false },
       order: { fechaCreacion: 'ASC' },
+      relations: { usuario: true },
     });
+    const scoresById = await this.getScoresByField(
+      'idComentario',
+      comments.map((comment) => comment.idComentario),
+    );
+
+    return { items: comments, scoresById };
   }
 
   async listArticleComments(idArticulo: number) {
     await this.getArticleById(idArticulo);
 
-    return this.commentRepository.find({
-      where: { idArticulo },
+    const comments = await this.commentRepository.find({
+      where: { idArticulo, eliminado: false },
       order: { fechaCreacion: 'ASC' },
+      relations: { usuario: true },
     });
+    const scoresById = await this.getScoresByField(
+      'idComentario',
+      comments.map((comment) => comment.idComentario),
+    );
+
+    return { items: comments, scoresById };
   }
 
   async listThreadCommentsRanked(idHilo: number) {
     await this.getThreadById(idHilo);
 
     const comments = await this.commentRepository.find({
-      where: { idHilo },
+      where: { idHilo, eliminado: false },
       order: { fechaCreacion: 'ASC' },
+      relations: { usuario: true },
     });
 
-    const votes = await this.voteRepository.find({ where: { idHilo } });
-
-    const scoreByComment = new Map<number, number>();
-    for (const vote of votes) {
-      if (!vote.idComentario) continue;
-      const current = scoreByComment.get(vote.idComentario) ?? 0;
-      const next =
-        vote.tipo === TipoValoracion.UPVOTE ? current + 1 : current - 1;
-      scoreByComment.set(vote.idComentario, next);
-    }
+    const scoreByComment = await this.getScoresByField(
+      'idComentario',
+      comments.map((comment) => comment.idComentario),
+    );
 
     return comments
       .map((comment) => ({
@@ -452,6 +490,31 @@ export class SocialService {
         'El comentario padre no pertenece al mismo destino',
       );
     }
+  }
+
+  private async getScoresByField(
+    field: 'idHilo' | 'idComentario' | 'idArticulo',
+    ids: number[],
+  ): Promise<Map<number, number>> {
+    if (ids.length === 0) {
+      return new Map();
+    }
+
+    const votes = await this.voteRepository.find({
+      where: { [field]: In(ids) } as Record<string, unknown>,
+    });
+
+    const scores = new Map<number, number>();
+    for (const vote of votes) {
+      const key = vote[field];
+      if (!key) continue;
+      const current = scores.get(key) ?? 0;
+      const next =
+        vote.tipo === TipoValoracion.UPVOTE ? current + 1 : current - 1;
+      scores.set(key, next);
+    }
+
+    return scores;
   }
 
   private hasArticleAuthorRole(roles: string[]): boolean {

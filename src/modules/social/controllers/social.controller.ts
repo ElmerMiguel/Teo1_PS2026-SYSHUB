@@ -51,7 +51,12 @@ export class SocialController {
   ): Promise<PaginatedSocialResponseDto<ThreadResponseDto>> {
     const result = await this.socialService.listThreads(query);
     return SocialSerializer.toPaginatedDto(
-      result.items.map((thread) => SocialSerializer.toThreadDto(thread)),
+      result.items.map((thread) =>
+        SocialSerializer.toThreadDto(
+          thread,
+          result.scoresById?.get(thread.idHilo),
+        ),
+      ),
       result.total,
       result.page,
       result.limit,
@@ -62,8 +67,8 @@ export class SocialController {
   async getThread(
     @Param('idHilo', ParseIntPipe) idHilo: number,
   ): Promise<ThreadResponseDto> {
-    const thread = await this.socialService.getThreadById(idHilo);
-    return SocialSerializer.toThreadDto(thread);
+    const result = await this.socialService.getThreadWithScore(idHilo);
+    return SocialSerializer.toThreadDto(result.thread, result.score);
   }
 
   @Post('articles')
@@ -83,7 +88,12 @@ export class SocialController {
   ): Promise<PaginatedSocialResponseDto<ArticleResponseDto>> {
     const result = await this.socialService.listArticles(query);
     return SocialSerializer.toPaginatedDto(
-      result.items.map((article) => SocialSerializer.toArticleDto(article)),
+      result.items.map((article) =>
+        SocialSerializer.toArticleDto(
+          article,
+          result.scoresById?.get(article.idArticulo),
+        ),
+      ),
       result.total,
       result.page,
       result.limit,
@@ -94,8 +104,8 @@ export class SocialController {
   async getArticle(
     @Param('idArticulo', ParseIntPipe) idArticulo: number,
   ): Promise<ArticleResponseDto> {
-    const article = await this.socialService.getArticleById(idArticulo);
-    return SocialSerializer.toArticleDto(article);
+    const result = await this.socialService.getArticleWithScore(idArticulo);
+    return SocialSerializer.toArticleDto(result.article, result.score);
   }
 
   @Post('threads/:idHilo/comments')
@@ -114,8 +124,13 @@ export class SocialController {
   async listThreadComments(
     @Param('idHilo', ParseIntPipe) idHilo: number,
   ): Promise<CommentResponseDto[]> {
-    const comments = await this.socialService.listThreadComments(idHilo);
-    return comments.map((comment) => SocialSerializer.toCommentDto(comment));
+    const result = await this.socialService.listThreadComments(idHilo);
+    return result.items.map((comment) =>
+      SocialSerializer.toCommentDto(
+        comment,
+        result.scoresById?.get(comment.idComentario),
+      ),
+    );
   }
 
   @Get('threads/:idHilo/comments/ranked')
@@ -144,8 +159,13 @@ export class SocialController {
   async listArticleComments(
     @Param('idArticulo', ParseIntPipe) idArticulo: number,
   ): Promise<CommentResponseDto[]> {
-    const comments = await this.socialService.listArticleComments(idArticulo);
-    return comments.map((comment) => SocialSerializer.toCommentDto(comment));
+    const result = await this.socialService.listArticleComments(idArticulo);
+    return result.items.map((comment) =>
+      SocialSerializer.toCommentDto(
+        comment,
+        result.scoresById?.get(comment.idComentario),
+      ),
+    );
   }
 
   @Post('votes')

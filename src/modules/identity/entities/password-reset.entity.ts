@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UsuarioEntity } from './usuario.entity';
 
 @Entity('password_reset')
@@ -7,6 +13,7 @@ export class PasswordResetEntity {
   idReset!: number;
 
   @ManyToOne(() => UsuarioEntity, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'id_usuario' })
   usuario!: UsuarioEntity;
 
   @Column({ name: 'id_usuario', type: 'int' })

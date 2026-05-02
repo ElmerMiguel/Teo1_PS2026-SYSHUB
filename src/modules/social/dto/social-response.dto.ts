@@ -10,6 +10,13 @@ export class SocialCategoryResponseDto {
   areaTecnica!: AreaTecnicaCategoria;
 }
 
+export class UserSummaryDto {
+  idUsuario!: number;
+  nombre!: string;
+  apellido!: string;
+  fotoPerfil?: string;
+}
+
 export class ThreadResponseDto {
   idHilo!: number;
   titulo!: string;
@@ -21,6 +28,8 @@ export class ThreadResponseDto {
   vistas!: number;
   fijado!: boolean;
   categoria?: SocialCategoryResponseDto;
+  usuario?: UserSummaryDto;
+  score?: number;
 }
 
 export class ArticleResponseDto {
@@ -32,6 +41,8 @@ export class ArticleResponseDto {
   idAutor!: number;
   estado!: EstadoArticulo;
   imagenPortada?: string;
+  autor?: UserSummaryDto;
+  score?: number;
 }
 
 export class CommentResponseDto {
@@ -44,6 +55,7 @@ export class CommentResponseDto {
   idComentarioPadre?: number;
   eliminado!: boolean;
   score?: number;
+  usuario?: UserSummaryDto;
 }
 
 export class VoteResponseDto {

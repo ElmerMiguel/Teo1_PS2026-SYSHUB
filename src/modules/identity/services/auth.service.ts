@@ -231,7 +231,7 @@ export class AuthService {
 
   async requestPasswordReset(
     payload: RequestPasswordResetDto,
-  ): Promise<{ message: string; token?: string }> {
+  ): Promise<{ message: string; token?: string; resetUrl?: string }> {
     const user = await this.findUserByEmail(payload.email.toLowerCase());
     if (!user) {
       return { message: 'Si el correo existe, enviaremos un enlace.' };
@@ -247,9 +247,14 @@ export class AuthService {
     });
     await this.passwordResetRepository.save(reset);
 
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    const frontendBase = frontendUrl ?? 'http://localhost:8080';
+    const resetUrl = `${frontendBase}/auth/reset?token=${token}`;
+
     return {
       message: 'Enlace de recuperación generado. Revisa tu correo.',
       token,
+      resetUrl,
     };
   }
 

@@ -98,10 +98,10 @@ VALUES
   ('upvote', (SELECT id_usuario FROM USUARIO WHERE email = 'moderador1@syshub.com'), NULL, NULL, (SELECT id_articulo FROM ARTICULO WHERE titulo LIKE 'Introducción a Docker%'));
 
 -- 13. Agregar Material Guardado (Marcadores)
-INSERT INTO MATERIAL_GUARDADO (id_usuario, tipo_contenido, id_contenido, "usuarioIdUsuario")
+INSERT INTO MATERIAL_GUARDADO (id_usuario, tipo_contenido, id_contenido)
 VALUES
-  ((SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), 'proyecto', (SELECT id_proyecto FROM PROYECTO WHERE titulo = 'Sistema de Gestión de Inventario'), (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com')),
-  ((SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), 'articulo', (SELECT id_articulo FROM ARTICULO WHERE titulo LIKE 'Introducción a Docker%'), (SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'));
+  ((SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), 'proyecto', (SELECT id_proyecto FROM PROYECTO WHERE titulo = 'Sistema de Gestión de Inventario')),
+  ((SELECT id_usuario FROM USUARIO WHERE email = 'estudiante1@syshub.com'), 'articulo', (SELECT id_articulo FROM ARTICULO WHERE titulo LIKE 'Introducción a Docker%'));
 
 -- 14. Agregar Vistas de Proyectos
 INSERT INTO PROYECTO_VISTA (id_proyecto, id_usuario)

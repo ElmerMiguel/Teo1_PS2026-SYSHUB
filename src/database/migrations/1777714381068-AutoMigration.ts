@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AutoMigration1777595498421 implements MigrationInterface {
-    name = 'AutoMigration1777595498421'
+export class AutoMigration1777714381068 implements MigrationInterface {
+    name = 'AutoMigration1777714381068'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "rol" ("id_rol" SERIAL NOT NULL, "nombre_rol" character varying(50) NOT NULL, "descripcion" character varying(255), CONSTRAINT "UQ_25cd1dbb608db5a46969d902f53" UNIQUE ("nombre_rol"), CONSTRAINT "PK_0b42a30072d57ccfad9949218da" PRIMARY KEY ("id_rol"))`);
-        await queryRunner.query(`CREATE TABLE "sesion" ("id_sesion" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "token_hash" character varying(255) NOT NULL, "fecha_creacion" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "fecha_expiracion" TIMESTAMP WITH TIME ZONE NOT NULL, "ip_address" inet, "activa" boolean NOT NULL DEFAULT true, "usuarioIdUsuario" integer NOT NULL, CONSTRAINT "PK_25f520935e8570102c469357dfc" PRIMARY KEY ("id_sesion"))`);
+        await queryRunner.query(`CREATE TABLE "sesion" ("id_sesion" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "token_hash" character varying(255) NOT NULL, "fecha_creacion" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "fecha_expiracion" TIMESTAMP WITH TIME ZONE NOT NULL, "ip_address" inet, "activa" boolean NOT NULL DEFAULT true, CONSTRAINT "PK_25f520935e8570102c469357dfc" PRIMARY KEY ("id_sesion"))`);
         await queryRunner.query(`CREATE TYPE "public"."material_guardado_tipo_contenido_enum" AS ENUM('proyecto', 'articulo', 'hilo')`);
-        await queryRunner.query(`CREATE TABLE "material_guardado" ("id_guardado" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "tipo_contenido" "public"."material_guardado_tipo_contenido_enum" NOT NULL, "id_contenido" integer NOT NULL, "fecha_guardado" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "usuarioIdUsuario" integer NOT NULL, CONSTRAINT "PK_5a50eb462debd1a68def8f11df9" PRIMARY KEY ("id_guardado"))`);
+        await queryRunner.query(`CREATE TABLE "material_guardado" ("id_guardado" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "tipo_contenido" "public"."material_guardado_tipo_contenido_enum" NOT NULL, "id_contenido" integer NOT NULL, "fecha_guardado" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_5a50eb462debd1a68def8f11df9" PRIMARY KEY ("id_guardado"))`);
         await queryRunner.query(`CREATE TABLE "usuario" ("id_usuario" SERIAL NOT NULL, "nombre" character varying(100) NOT NULL, "apellido" character varying(100) NOT NULL, "email" character varying(150) NOT NULL, "password_hash" character varying(255) NOT NULL, "fecha_registro" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "activo" boolean NOT NULL DEFAULT true, "foto_perfil" character varying(255), "carnet" character varying(20), "semestre" integer, "failed_login_attempts" integer NOT NULL DEFAULT '0', "lock_until" TIMESTAMP WITH TIME ZONE, CONSTRAINT "UQ_2863682842e688ca198eb25c124" UNIQUE ("email"), CONSTRAINT "PK_dd52716c2652e0e23c15530c695" PRIMARY KEY ("id_usuario"))`);
         await queryRunner.query(`CREATE TABLE "archivo_proyecto" ("id_archivo" SERIAL NOT NULL, "id_proyecto" integer NOT NULL, "nombre_archivo" character varying(255) NOT NULL, "ruta_archivo" character varying(500) NOT NULL, "tipo_mime" character varying(100), "tamanio_bytes" bigint, "fecha_subida" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_5077b4ab81894603f74be1561e0" PRIMARY KEY ("id_archivo"))`);
         await queryRunner.query(`CREATE TABLE "curaduria" ("id_curaduria" SERIAL NOT NULL, "id_proyecto" integer NOT NULL, "id_auxiliar" integer, "comentario_auxiliar" text, "fecha_destacado" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "activo" boolean NOT NULL DEFAULT true, CONSTRAINT "UQ_be08e479aab1bdc7cc7b6478006" UNIQUE ("id_proyecto"), CONSTRAINT "REL_be08e479aab1bdc7cc7b647800" UNIQUE ("id_proyecto"), CONSTRAINT "PK_2c01094865c81fb0a37de821e94" PRIMARY KEY ("id_curaduria"))`);
@@ -26,7 +26,7 @@ export class AutoMigration1777595498421 implements MigrationInterface {
         await queryRunner.query(`CREATE TYPE "public"."valoracion_tipo_enum" AS ENUM('upvote', 'downvote')`);
         await queryRunner.query(`CREATE TABLE "valoracion" ("id_valoracion" SERIAL NOT NULL, "tipo" "public"."valoracion_tipo_enum" NOT NULL, "id_usuario" integer NOT NULL, "id_hilo" integer, "id_comentario" integer, "id_articulo" integer, "fecha" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_0d6c8f3cb04816e3df8648f64f4" PRIMARY KEY ("id_valoracion"))`);
         await queryRunner.query(`CREATE TABLE "proyecto_vista" ("id_vista" SERIAL NOT NULL, "id_proyecto" integer NOT NULL, "id_usuario" integer NOT NULL, "fecha_visita" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "uq_proyecto_vista_usuario" UNIQUE ("id_proyecto", "id_usuario"), CONSTRAINT "PK_a9428ccf9b15cfba2dace59b1e8" PRIMARY KEY ("id_vista"))`);
-        await queryRunner.query(`CREATE TABLE "password_reset" ("id_reset" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "token_hash" character varying(255) NOT NULL, "fecha_creacion" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "fecha_expiracion" TIMESTAMP WITH TIME ZONE NOT NULL, "usado" boolean NOT NULL DEFAULT false, "usuarioIdUsuario" integer NOT NULL, CONSTRAINT "PK_3b2564b17efeabdfbb293b8c8da" PRIMARY KEY ("id_reset"))`);
+        await queryRunner.query(`CREATE TABLE "password_reset" ("id_reset" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "token_hash" character varying(255) NOT NULL, "fecha_creacion" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "fecha_expiracion" TIMESTAMP WITH TIME ZONE NOT NULL, "usado" boolean NOT NULL DEFAULT false, CONSTRAINT "PK_3b2564b17efeabdfbb293b8c8da" PRIMARY KEY ("id_reset"))`);
         await queryRunner.query(`CREATE TABLE "usuario_suspension" ("id_suspension" SERIAL NOT NULL, "id_usuario" integer NOT NULL, "id_admin" integer NOT NULL, "razon" character varying(255) NOT NULL, "detalle" text, "fecha_inicio" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "fecha_fin" TIMESTAMP WITH TIME ZONE, "activo" boolean NOT NULL DEFAULT true, CONSTRAINT "PK_36d73861e4e332d5d80402efef5" PRIMARY KEY ("id_suspension"))`);
         await queryRunner.query(`CREATE TABLE "admin_audit" ("id_audit" SERIAL NOT NULL, "accion" character varying(120) NOT NULL, "entidad" character varying(120) NOT NULL, "entidad_id" integer, "detalles" jsonb, "fecha_accion" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "id_admin" integer NOT NULL, CONSTRAINT "PK_d43c4fc22ef2bd96bf9769d0611" PRIMARY KEY ("id_audit"))`);
         await queryRunner.query(`CREATE TABLE "usuario_rol" ("id_usuario" integer NOT NULL, "id_rol" integer NOT NULL, CONSTRAINT "PK_cc28ffbe77be599168e1ec8670a" PRIMARY KEY ("id_usuario", "id_rol"))`);
@@ -35,8 +35,8 @@ export class AutoMigration1777595498421 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "proyecto_etiqueta" ("id_proyecto" integer NOT NULL, "id_etiqueta" integer NOT NULL, CONSTRAINT "PK_afd865d4c5fbb38edde3702f2c3" PRIMARY KEY ("id_proyecto", "id_etiqueta"))`);
         await queryRunner.query(`CREATE INDEX "IDX_a1387e6b95efce03d26a32affd" ON "proyecto_etiqueta" ("id_proyecto") `);
         await queryRunner.query(`CREATE INDEX "IDX_b7b5a0ea9ea17b74a346677bb6" ON "proyecto_etiqueta" ("id_etiqueta") `);
-        await queryRunner.query(`ALTER TABLE "sesion" ADD CONSTRAINT "FK_27677dd2cccb3876dd7bab07edf" FOREIGN KEY ("usuarioIdUsuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "material_guardado" ADD CONSTRAINT "FK_e084b5022cdc29f9a12d1764fff" FOREIGN KEY ("usuarioIdUsuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "sesion" ADD CONSTRAINT "FK_7d073f65760a3be0c92ed846c93" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "material_guardado" ADD CONSTRAINT "FK_aa069f8c33f89f0b9e9bd872bba" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "archivo_proyecto" ADD CONSTRAINT "FK_13dd61c484544eb240b0d8553a8" FOREIGN KEY ("id_proyecto") REFERENCES "proyecto"("id_proyecto") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "curaduria" ADD CONSTRAINT "FK_be08e479aab1bdc7cc7b6478006" FOREIGN KEY ("id_proyecto") REFERENCES "proyecto"("id_proyecto") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "curaduria" ADD CONSTRAINT "FK_5f37dcfce10d94749c0a516936b" FOREIGN KEY ("id_auxiliar") REFERENCES "usuario"("id_usuario") ON DELETE SET NULL ON UPDATE NO ACTION`);
@@ -61,7 +61,7 @@ export class AutoMigration1777595498421 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "valoracion" ADD CONSTRAINT "FK_6753e36072feebf961ec03938c8" FOREIGN KEY ("id_articulo") REFERENCES "articulo"("id_articulo") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "proyecto_vista" ADD CONSTRAINT "FK_109812c00559cda8b1368846695" FOREIGN KEY ("id_proyecto") REFERENCES "proyecto"("id_proyecto") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "proyecto_vista" ADD CONSTRAINT "FK_8e5b94e3fdfeee24db7c596329b" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "password_reset" ADD CONSTRAINT "FK_b457a4fdd2adfea4605fbff3868" FOREIGN KEY ("usuarioIdUsuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "password_reset" ADD CONSTRAINT "FK_8a3f1ef9624c08d697676d5c3f2" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "usuario_suspension" ADD CONSTRAINT "FK_4e67864fae11a64d22b5ea6c263" FOREIGN KEY ("id_usuario") REFERENCES "usuario"("id_usuario") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "usuario_suspension" ADD CONSTRAINT "FK_3fae5e55e729d12d9c18ebc621e" FOREIGN KEY ("id_admin") REFERENCES "usuario"("id_usuario") ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "admin_audit" ADD CONSTRAINT "FK_e9a007af59c9a03d1c4280aef17" FOREIGN KEY ("id_admin") REFERENCES "usuario"("id_usuario") ON DELETE SET NULL ON UPDATE NO ACTION`);
@@ -79,7 +79,7 @@ export class AutoMigration1777595498421 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "admin_audit" DROP CONSTRAINT "FK_e9a007af59c9a03d1c4280aef17"`);
         await queryRunner.query(`ALTER TABLE "usuario_suspension" DROP CONSTRAINT "FK_3fae5e55e729d12d9c18ebc621e"`);
         await queryRunner.query(`ALTER TABLE "usuario_suspension" DROP CONSTRAINT "FK_4e67864fae11a64d22b5ea6c263"`);
-        await queryRunner.query(`ALTER TABLE "password_reset" DROP CONSTRAINT "FK_b457a4fdd2adfea4605fbff3868"`);
+        await queryRunner.query(`ALTER TABLE "password_reset" DROP CONSTRAINT "FK_8a3f1ef9624c08d697676d5c3f2"`);
         await queryRunner.query(`ALTER TABLE "proyecto_vista" DROP CONSTRAINT "FK_8e5b94e3fdfeee24db7c596329b"`);
         await queryRunner.query(`ALTER TABLE "proyecto_vista" DROP CONSTRAINT "FK_109812c00559cda8b1368846695"`);
         await queryRunner.query(`ALTER TABLE "valoracion" DROP CONSTRAINT "FK_6753e36072feebf961ec03938c8"`);
@@ -104,8 +104,8 @@ export class AutoMigration1777595498421 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "curaduria" DROP CONSTRAINT "FK_5f37dcfce10d94749c0a516936b"`);
         await queryRunner.query(`ALTER TABLE "curaduria" DROP CONSTRAINT "FK_be08e479aab1bdc7cc7b6478006"`);
         await queryRunner.query(`ALTER TABLE "archivo_proyecto" DROP CONSTRAINT "FK_13dd61c484544eb240b0d8553a8"`);
-        await queryRunner.query(`ALTER TABLE "material_guardado" DROP CONSTRAINT "FK_e084b5022cdc29f9a12d1764fff"`);
-        await queryRunner.query(`ALTER TABLE "sesion" DROP CONSTRAINT "FK_27677dd2cccb3876dd7bab07edf"`);
+        await queryRunner.query(`ALTER TABLE "material_guardado" DROP CONSTRAINT "FK_aa069f8c33f89f0b9e9bd872bba"`);
+        await queryRunner.query(`ALTER TABLE "sesion" DROP CONSTRAINT "FK_7d073f65760a3be0c92ed846c93"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_b7b5a0ea9ea17b74a346677bb6"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_a1387e6b95efce03d26a32affd"`);
         await queryRunner.query(`DROP TABLE "proyecto_etiqueta"`);
